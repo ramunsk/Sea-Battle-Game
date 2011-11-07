@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeatBattle", "SeatBattle\SeatBattle.csproj", "{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeatBattle.CSharp", "SeatBattle.CSharp\SeatBattle.CSharp.csproj", "{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
