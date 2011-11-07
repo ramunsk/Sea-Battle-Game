@@ -20,7 +20,7 @@ namespace SeatBattle.CSharp.GameBoard
 
             for (var i = 0; i < 10; i++)
             {
-                _tlpHuman.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 9));
+                _tlpHuman.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 9));
                 _tlpHuman.RowStyles.Add(new RowStyle(SizeType.Percent, 9));
             }
 
@@ -58,7 +58,7 @@ namespace SeatBattle.CSharp.GameBoard
         void _tlpHuman_CellPaint(object sender, TableLayoutCellPaintEventArgs e)
         {
             var r = e.CellBounds;
-
+            var b = new SolidBrush(Color.LightBlue);
             var panel = (TableLayoutPanel)sender;
 
             using (var pen = new Pen(Color.CornflowerBlue, 0 /*1px width despite of page scale, dpi, page units*/ ))
