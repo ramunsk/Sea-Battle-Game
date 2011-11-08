@@ -17,6 +17,7 @@ namespace SeaBattleCpp {
 
 
         this->SuspendLayout();
+        this->CreateWindowLayout();
         this->CreateHumanBoard();
         this->ResumeLayout();
     
@@ -40,8 +41,22 @@ namespace SeaBattleCpp {
         pnl->Height = CELL_HEIGHT * 11;
 
 
+        this->AddGridLabels(pnl);
+
         this->Controls->Add(this->_tlpHuman);
         
+    }
+
+    void GameBoard::CreateWindowLayout(){
+        
+        this->AutoScaleDimensions = SD::SizeF(8, 19);
+        this->AutoScaleMode = WF::AutoScaleMode::Font;
+        this->ClientSize = SD::Size(800, 500);
+        this->Font = gcnew SD::Font("Calibri", 10, SD::FontStyle::Regular, SD::GraphicsUnit::Point, 186);
+        this->Margin = WF::Padding(4, 4, 4, 4);
+        //this.Name = "GameBoard";
+        //this.Text = "GameBoard";
+
     }
 
     void GameBoard::OnBoardCellPaint(System::Object^ sender, WF::TableLayoutCellPaintEventArgs^ e){
@@ -70,5 +85,23 @@ namespace SeaBattleCpp {
         
 
         delete pen;
+    }
+
+    void GameBoard::AddGridLabels(WF::TableLayoutPanel^ panel){
+    
+        for(int i = 1; i < 11; i++)
+        {
+            WF::Label^ lblLeft = (gcnew WF::Label());
+            lblLeft->Dock = System::Windows::Forms::DockStyle::Fill;
+            lblLeft->TextAlign = SD::ContentAlignment::MiddleCenter;
+            lblLeft->Text = i.ToString();
+            panel->Controls->Add(lblLeft, 0, i);
+
+            WF::Label^ lblTop = (gcnew WF::Label());
+            lblTop->Dock = System::Windows::Forms::DockStyle::Fill;
+            lblTop->TextAlign = SD::ContentAlignment::MiddleCenter;
+            lblTop->Text = System::String::Format(L"{0}", ((System::Char)(64+i)));
+            panel->Controls->Add(lblTop, i, 0);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Drawing;
+using System.Windows.Forms;
 
 namespace SeatBattle.CSharp.GameBoard
 {
@@ -8,6 +9,7 @@ namespace SeatBattle.CSharp.GameBoard
         {
             InitializeComponent();
             LayoutHumanPanel();
+            //this.Font
         }
     }
 }

@@ -11,6 +11,8 @@ namespace SeatBattle.CSharp.GameBoard
 
         private void LayoutHumanPanel()
         {
+            System.Char c = (System.Char) 65;
+
             _tlpHuman.ColumnCount = 11;
             _tlpHuman.RowCount = 11;
             _tlpHuman.BackColor = Color.LightBlue;
