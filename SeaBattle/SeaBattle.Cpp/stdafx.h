@@ -4,3 +4,6 @@
 #pragma once
 
 // TODO: reference additional headers your program requires here
+using namespace System::Drawing;
+using namespace System::Windows::Forms;
+

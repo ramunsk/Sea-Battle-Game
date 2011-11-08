@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "GameBoard.h"
 
-using namespace SeaBattleCpp;
 using namespace System;
 using namespace System::Windows::Forms;
+using namespace SeaBattle::Cpp;
 
 [STAThreadAttribute]
 int main(array<System::String ^> ^args)

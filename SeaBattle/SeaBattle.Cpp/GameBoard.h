@@ -1,29 +1,19 @@
 #pragma once
+#include "PlayerBoard.h"
 
-namespace WF = System::Windows::Forms;
-namespace SD = System::Drawing;
+namespace SeaBattle {
+    namespace Cpp {
+	    public ref class GameBoard : public Form
+	    {
+            private:
+                initonly PlayerBoard^ _humanBoard;
 
-namespace SeaBattleCpp {
-	public ref class GameBoard : public WF::Form
-	{
-	    public:
-		    GameBoard();
+                void CreateWindowLayout();
 
-        private:
-            literal int CELL_HEIGHT = 30;
-            literal int CELL_WIDTH = 30;
-            initonly SD::Color CELL_BORDER_COLOR;
-            initonly SD::Color CELL_BG_COLOR;
+            public:
+		        GameBoard();
 
-            WF::TableLayoutPanel^ _tlpHuman;
-
-
-            void CreateLayout();
-            void CreateWindowLayout();
-            void CreateHumanBoard();
-            void AddGridLabels(WF::TableLayoutPanel^ panel);
-            void OnBoardCellPaint(System::Object^ sender, WF::TableLayoutCellPaintEventArgs^ e);
-
-    };
+        };
+    }
 }
 

@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameBoard.cpp" />
+    <ClCompile Include="PlayerBoard.cpp" />
     <ClCompile Include="Program.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -97,6 +98,7 @@
     <ClInclude Include="GameBoard.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="PlayerBoard.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TempForm.h">
@@ -104,10 +106,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="GameBoard.resX">
-      <DependentUpon>GameBoard.h</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="TempForm.resx">
       <DependentUpon>TempForm.h</DependentUpon>
     </EmbeddedResource>
