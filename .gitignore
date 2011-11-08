@@ -6,3 +6,4 @@ obj
 *.dotcover
 Debug
 *.sdf
+*.opensdf
