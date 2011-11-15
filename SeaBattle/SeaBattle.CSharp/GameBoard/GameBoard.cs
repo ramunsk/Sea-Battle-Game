@@ -5,15 +5,15 @@ namespace SeatBattle.CSharp.GameBoard
 {
     public class GameBoard : Form
     {
-        private readonly PlayerBoard _humanBoard;
+        //private readonly PlayerBoard _humanBoard;
 
         public GameBoard()
         {
             SuspendLayout();
             
             CreateWindowlayout();
-            _humanBoard = new PlayerBoard();
-            Controls.Add(_humanBoard);
+            //_humanBoard = new PlayerBoard();
+            //Controls.Add(_humanBoard);
 
             ResumeLayout();
         }

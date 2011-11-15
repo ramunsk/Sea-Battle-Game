@@ -3,89 +3,58 @@ using System.Windows.Forms;
 
 namespace SeatBattle.CSharp.GameBoard
 {
-    public class PlayerBoard : TableLayoutPanel
+    public partial class PlayerBoardOld : TableLayoutPanel
     {
         private const int DefaultCellHeight = 30;
         private const int DefaultCellWidth = 30;
         private readonly Color DefaultCellBackgroundColor;
         private readonly Color DefaultCellBorderColor;
+        private readonly Label[,] _cells;
 
-        //private int _cellWidth;
-        //public int CellWidth
-        //{
-        //    get
-        //    {
-        //        return _cellWidth;
-        //    }
-        //    set
-        //    {
-        //        _cellWidth = value;
-        //        Invalidate();
-        //    }
-        //}
 
-        //private int _cellHeight;
-        //public int CellHeight
-        //{
-        //    get
-        //    {
-        //        return _cellHeight;
-        //    }
-        //    set
-        //    {
-        //        _cellHeight = value;
-        //        Invalidate();
-        //    }
-        //}
-
-        //private Color _cellBorderColor;
-        //public Color CellBorderColor
-        //{
-        //    get
-        //    {
-        //        return _cellBorderColor;
-        //    }
-        //    set
-        //    {
-        //        _cellBorderColor = value;
-        //        Invalidate();
-        //    }
-        //}
-
-        //private Color _cellBackgroundColor;
-        //public Color CellBackgroundColor
-        //{
-        //    get
-        //    {
-        //        return _cellBackgroundColor;
-        //    }
-        //    set
-        //    {
-        //        _cellBackgroundColor = value;
-        //        Invalidate();
-        //    }
-        //}
-
-        public PlayerBoard()
+        public PlayerBoardOld()
         {
             DefaultCellBackgroundColor = Color.LightBlue;
             DefaultCellBorderColor = Color.CornflowerBlue;
 
-            //CellWidth = DefaultCellWidth;
-            //CellHeight = DefaultCellHeight;
-
-            //CellBackgroundColor = DefaultCellBackgroundColor;
-            //CellBorderColor = DefaultCellBorderColor;
-
             ColumnCount = 11;
             RowCount = 11;
 
+            _cells = new Label[10,10];
+
             AddCellStyles();
             AddBoardHeaders();
+            AddBoardElements();
 
             Width = DefaultCellWidth * 11;
             Height = DefaultCellHeight * 11;
 
+        }
+
+        private void AddBoardElements()
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                for (var j = 0; j < 10; j++)
+                {
+                    var label = new Label
+                                    {
+                                        Dock = DockStyle.Fill, 
+                                        AutoSize = false,
+                                        Margin = new Padding(0)
+                                    };
+                    label.Click += label_Click;
+
+                    Controls.Add(label, i + 1, j + 1);
+                    _cells[i, j] = label;
+                }
+            }
+
+        }
+
+        void label_Click(object sender, System.EventArgs e)
+        {
+            ((Label)sender).BackColor = Color.Red;
         }
 
         private void AddBoardHeaders()
@@ -118,7 +87,6 @@ namespace SeatBattle.CSharp.GameBoard
                 RowStyles.Add(new RowStyle(SizeType.Absolute, DefaultCellHeight));
             }
         }
-
 
         protected override void OnCellPaint(TableLayoutCellPaintEventArgs e)
         {

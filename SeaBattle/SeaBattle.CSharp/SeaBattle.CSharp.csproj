@@ -65,11 +65,20 @@
     <Compile Include="GameBoard\GameBoard.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GameBoard\PlayerBoard.cs">
+    <Compile Include="GameBoard\Board.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GameBoard\PlayerBoardOld.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Ship.cs" />
+    <Compile Include="tmp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="tmp.Designer.cs">
+      <DependentUpon>tmp.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
@@ -95,6 +104,11 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="tmp.resx">
+      <DependentUpon>tmp.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
