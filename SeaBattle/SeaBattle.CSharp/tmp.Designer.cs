@@ -28,26 +28,25 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.boardCell1 = new SeatBattle.CSharp.GameBoard.BoardCell();
+            this.board1 = new SeatBattle.CSharp.GameBoard.Board();
             this.SuspendLayout();
             // 
-            // boardCell1
+            // board1
             // 
-            this.boardCell1.BackColor = System.Drawing.Color.LightBlue;
-            this.boardCell1.Font = new System.Drawing.Font("Webdings", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
-            this.boardCell1.Location = new System.Drawing.Point(70, 38);
-            this.boardCell1.Name = "boardCell1";
-            this.boardCell1.Size = new System.Drawing.Size(25, 25);
-            this.boardCell1.TabIndex = 0;
-            this.boardCell1.Text = "boardCell1";
-            this.boardCell1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.board1.Location = new System.Drawing.Point(12, 12);
+            this.board1.Name = "board1";
+            this.board1.Size = new System.Drawing.Size(383, 293);
+            this.board1.TabIndex = 0;
+            this.board1.Text = "board1";
             // 
             // tmp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 262);
-            this.Controls.Add(this.boardCell1);
+            this.ClientSize = new System.Drawing.Size(473, 390);
+            this.Controls.Add(this.board1);
+            this.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(186)));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "tmp";
             this.Text = "tmp";
             this.ResumeLayout(false);
@@ -56,7 +55,8 @@
 
         #endregion
 
-        private GameBoard.BoardCell boardCell1;
+        private GameBoard.Board board1;
+
 
 
     }
