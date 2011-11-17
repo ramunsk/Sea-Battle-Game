@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -70,7 +71,6 @@ namespace SeatBattle.CSharp.GameBoard
 
         private void CreateBoard()
         {
-            var rand = new Random(DateTime.Now.Millisecond);
             for (var i = 0; i < 10; i++)
             {
                 for (var j = 0; j < 10; j++)
@@ -79,7 +79,7 @@ namespace SeatBattle.CSharp.GameBoard
                                    {
                                        Size = CellSize,
                                        Location = new Point(CellSize.Height * (i + 1), CellSize.Width * (j + 1)),
-                                       State = j + 1 <= 5 ? (BoardCellState)(j+1) : BoardCellState.Normal
+                                       State = BoardCellState.Normal
                                    };
                     _cells[i, j] = cell;
                     Controls.Add(cell);
@@ -90,6 +90,14 @@ namespace SeatBattle.CSharp.GameBoard
         }
 
         public Size CellSize { get { return new Size(25, 25); } }
+
+        public void AddShip(Ship ship)
+        {
+            if (ship.Location == new Point(-1, -1))
+                throw new Exception("Bad ship location");
+
+            
+        }
 
     }
 

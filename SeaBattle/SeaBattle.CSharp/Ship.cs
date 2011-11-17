@@ -8,13 +8,34 @@ namespace SeatBattle.CSharp
     {
         public Point Location { get; set; }
         public int Length { get; set; }
-        public bool IsHorizontal { get; set; }
+        public ShipOrientation Orientation { get; set; }
 
         public Ship(int length)
         {
             Length = length;
             Location = new Point(-1, -1);
         }
+    }
+
+
+    public class ShipCollection : List<Ship>
+    {
+        public void Randomize()
+        {
+            foreach (var ship in this)
+            {
+                //var rnd = new Random(DateTime.Now.Millisecond);
+                //ship.Orientation = 
+            }
+        }
+    }
+
+
+
+    public enum ShipOrientation
+    {
+        Horizontal,
+        Vertical
     }
 
     public class RandomPoint
