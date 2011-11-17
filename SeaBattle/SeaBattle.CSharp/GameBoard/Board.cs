@@ -93,10 +93,19 @@ namespace SeatBattle.CSharp.GameBoard
 
         public void AddShip(Ship ship)
         {
-            if (ship.Location == new Point(-1, -1))
+
+            var x = ship.Location.X - 1;
+            var y = ship.Location.Y - 1;
+
+            if (x < 0 || x > 9 || y < 0 || y > 9)
                 throw new Exception("Bad ship location");
 
-            
+            for (var i = 0; i < ship.Length; i++)
+            {
+                var dx = ship.Orientation == ShipOrientation.Horizontal ? x + i : x;
+                var dy = ship.Orientation == ShipOrientation.Horizontal ? y : y + i;
+                _cells[dx, dy].State = BoardCellState.Ship;
+            }
         }
 
     }
@@ -174,9 +183,9 @@ namespace SeatBattle.CSharp.GameBoard
         {
             base.OnPaint(e);
 
-            if (State == BoardCellState.Ship || State == BoardCellState.ShotShip)
-                return;
-            
+            //if (State == BoardCellState.Ship || State == BoardCellState.ShotShip)
+            //    return;
+
             using (var pen = new Pen(_borderColor, 0))
             {
                 pen.Alignment = PenAlignment.Inset;

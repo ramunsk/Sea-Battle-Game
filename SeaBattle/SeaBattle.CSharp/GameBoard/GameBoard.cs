@@ -5,17 +5,24 @@ namespace SeatBattle.CSharp.GameBoard
 {
     public class GameBoard : Form
     {
-        //private readonly PlayerBoard _humanBoard;
+        private readonly Board _humanBoard;
 
         public GameBoard()
         {
             SuspendLayout();
             
             CreateWindowlayout();
-            //_humanBoard = new PlayerBoard();
-            //Controls.Add(_humanBoard);
+            _humanBoard = new Board();
+            Controls.Add(_humanBoard);
 
             ResumeLayout();
+
+            DoubleClick += GameBoard_DoubleClick;
+        }
+
+        void GameBoard_DoubleClick(object sender, System.EventArgs e)
+        {
+            _humanBoard.AddShip(new Ship(4) {Orientation = ShipOrientation.Horizontal, Location = new Point(7, 10)});
         }
 
         private void CreateWindowlayout()
