@@ -15,6 +15,7 @@ namespace SeatBattle.CSharp.GameBoard
         private readonly Label[] _rowHeaders;
         private readonly Label[] _columnHeaders;
         private readonly List<Ship> _ships;
+        private Ship _draggedShip;
 
 
         public Board()
@@ -112,6 +113,7 @@ namespace SeatBattle.CSharp.GameBoard
             if (ship == null)
                 return;
 
+            _draggedShip = ship;
             cell.DoDragDrop(ship, DragDropEffects.Copy | DragDropEffects.Move);
         }
 
@@ -120,13 +122,16 @@ namespace SeatBattle.CSharp.GameBoard
 
             if (e.Data.GetDataPresent(typeof(Ship)))
             {
-                var ship = e.Data.GetData(typeof(Ship)) as Ship;
-                var cell = sender as BoardCell;
+                var ship = _draggedShip;
+                var cell = (BoardCell)sender;
 
-                var state = CanPlaceShip(ship, cell.X, cell.Y) ? BoardCellState.ShipDrag : BoardCellState.ShipDragInvalid;
+                var canPlaceShip = CanPlaceShip(ship, cell.X, cell.Y);
+                var state = canPlaceShip ? BoardCellState.ShipDrag : BoardCellState.ShipDragInvalid;
 
                 DrawDragableShip(ship, cell.X, cell.Y, state);
-                e.Effect = DragDropEffects.Move;
+                
+                
+                e.Effect = canPlaceShip ? DragDropEffects.Move : DragDropEffects.None;
             }
             else
             {
@@ -137,13 +142,13 @@ namespace SeatBattle.CSharp.GameBoard
         private void OnCellDragLeave(object sender, EventArgs e)
         {
             var cell = (BoardCell)sender;
-            //cell.RestorePreviousState();
+            ClearDragableShip(_draggedShip, cell.X, cell.Y);
         }
 
         private void OnCellDragDrop(object sender, DragEventArgs e)
         {
             var cell = (BoardCell)sender;
-            if (e.Data.GetDataPresent(typeof(BoardCell)))
+            if (e.Data.GetDataPresent(typeof(Ship)))
             {
 
             }
@@ -196,8 +201,6 @@ namespace SeatBattle.CSharp.GameBoard
 
         private void DrawDragableShip(Ship ship, int x, int y, BoardCellState state)
         {
-            
-
             var dx = x;
             var dy = y;
 
@@ -219,7 +222,23 @@ namespace SeatBattle.CSharp.GameBoard
 
         private void ClearDragableShip(Ship ship, int x, int y)
         {
+            var dx = x;
+            var dy = y;
 
+            for (var i = 0; i < ship.Length; i++)
+            {
+                dx = ship.Orientation == ShipOrientation.Horizontal ? x + i : dx;
+                dy = ship.Orientation == ShipOrientation.Vertical ? y + i : dy;
+                //_cells[dx, dy].State = state;
+
+                Debug.WriteLine("x={0}, y={1}", dx, dy);
+
+                if (dx >= BoardWidth || dy >= BoardHeight)
+                    return;
+
+                var cell = _cells[dx, dy];
+                cell.RestorePreviousState();
+            }
         }
 
 
