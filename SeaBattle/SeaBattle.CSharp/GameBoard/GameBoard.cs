@@ -22,7 +22,7 @@ namespace SeatBattle.CSharp.GameBoard
 
         void GameBoard_DoubleClick(object sender, System.EventArgs e)
         {
-            _humanBoard.AddShip(new Ship(4) {Orientation = ShipOrientation.Horizontal, Location = new Point(7, 10)});
+            _humanBoard.AddShip(new Ship(4) {Orientation = ShipOrientation.Horizontal}, 6, 9);
         }
 
         private void CreateWindowlayout()

@@ -5,21 +5,27 @@ using System.Windows.Forms;
 
 namespace SeatBattle.CSharp.GameBoard
 {
+    [DebuggerDisplay("({X},{Y}) {_state}")]
     public class BoardCell : Label
     {
         private static readonly Color DefaultBorderColor = Color.CornflowerBlue;
         private static readonly Color DefaultBackgroundColor = Color.LightBlue;
-
         private static readonly Color DragOverBorderColor = Color.Orange;
         private static readonly Color DragOverInvalidBorderColor = Color.Red;
-
         private static readonly Color ShipColor = Color.Orange;
 
         private const char ShipHitChar = (char)0x72;
         private const char MissedHitChar = (char)0x3D;
 
-        public BoardCell()
+
+
+        private BoardCellState _state;
+        private BoardCellState _previousState;
+
+        public BoardCell(int x, int y)
         {
+            X = x;
+            Y = y;
             base.AutoSize = false;
             base.TextAlign = ContentAlignment.MiddleCenter;
             base.BackColor = Color.LightBlue;
@@ -27,7 +33,6 @@ namespace SeatBattle.CSharp.GameBoard
             base.AllowDrop = true;
         }
 
-        private BoardCellState _state;
         public BoardCellState State
         {
             get
@@ -36,14 +41,18 @@ namespace SeatBattle.CSharp.GameBoard
             }
             set
             {
+                _previousState = _state;
                 _state = value;
                 OnCellStateChenged();
             }
         }
 
-        public BoardCellState PreviousState { get; set; }
+        public void RestorePreviousState()
+        {
+            State = _previousState;
+        }
 
-        public bool IsValidForNewShip { get; set; }
+        //public bool IsValidForNewShip { get; set; }
 
         private void OnCellStateChenged()
         {
@@ -66,7 +75,16 @@ namespace SeatBattle.CSharp.GameBoard
                     Text = ShipHitChar.ToString();
                     BackColor = ShipColor;
                     break;
+                case BoardCellState.ShipDrag:
+                    BackColor = DefaultBackgroundColor;
+                    Text = string.Empty;
+                    break;
+                case BoardCellState.ShipDragInvalid:
+                    BackColor = DefaultBackgroundColor;
+                    Text = string.Empty;
+                    break;
             }
+            Invalidate();
             ResumeLayout();
         }
 
@@ -75,7 +93,6 @@ namespace SeatBattle.CSharp.GameBoard
             base.OnPaint(e);
 
             var borderColor = GetBorderColor();
-            Debug.WriteLine(borderColor);
 
             using (var pen = new Pen(borderColor))
             {
@@ -101,5 +118,7 @@ namespace SeatBattle.CSharp.GameBoard
             return DefaultBorderColor;
         }
 
+        public int X { get; private set; }
+        public int Y { get; private set; }
     }
 }

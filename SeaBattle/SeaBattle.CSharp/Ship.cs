@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace SeatBattle.CSharp
 {
+    [DebuggerDisplay("({Location.X},{Location.Y}) {Orientation}")]
     public class Ship
     {
         public Point Location { get; set; }
@@ -15,18 +17,13 @@ namespace SeatBattle.CSharp
             Length = length;
             Location = new Point(-1, -1);
         }
-    }
 
-
-    public class ShipCollection : List<Ship>
-    {
-        public void Randomize()
+        public bool IsLocatedAt(int x, int y)
         {
-            foreach (var ship in this)
-            {
-                //var rnd = new Random(DateTime.Now.Millisecond);
-                //ship.Orientation = 
-            }
+            var dx = Orientation == ShipOrientation.Horizontal ? Location.X + Length - 1 : Location.X;
+            var dy = Orientation == ShipOrientation.Vertical ? Location.Y + Length - 1 : Location.Y;
+
+            return (x >= Location.X && x <= dx && y >= Location.Y && y <= dy);
         }
     }
 
