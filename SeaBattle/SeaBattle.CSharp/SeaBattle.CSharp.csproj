@@ -62,6 +62,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameBoard\BoardCell.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GameBoard\BoardCellState.cs" />
     <Compile Include="GameBoard\GameBoard.cs">
       <SubType>Form</SubType>
     </Compile>

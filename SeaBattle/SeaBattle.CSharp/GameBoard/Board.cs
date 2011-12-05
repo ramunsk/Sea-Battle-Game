@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace SeatBattle.CSharp.GameBoard
 {
     public class Board : Control
     {
+        private const int BoardHeight = 10;
+        private const int BoardWidth = 10;
 
-        private BoardCell[,] _cells;
+        private readonly BoardCell[,] _cells;
         private readonly Label[] _rowHeaders;
         private readonly Label[] _columnHeaders;
 
@@ -85,7 +85,6 @@ namespace SeatBattle.CSharp.GameBoard
                     cell.DragEnter += OnCellDragEnter;
                     cell.DragLeave += OnCellDragLeave;
                     cell.DragDrop += OnCellDragDrop;
-
                     Controls.Add(cell);
                 }
             }
@@ -97,12 +96,11 @@ namespace SeatBattle.CSharp.GameBoard
             if (cell.State != BoardCellState.Ship)
                 return;
 
-            Debug.WriteLine("DragDrop started");
             cell.DoDragDrop(cell, DragDropEffects.Copy | DragDropEffects.Move);
             
         }
 
-        void OnCellDragEnter(object sender, DragEventArgs e)
+        private void OnCellDragEnter(object sender, DragEventArgs e)
         {
             var cell = (BoardCell)sender;
             if (e.Data.GetDataPresent(typeof(BoardCell)))
@@ -111,13 +109,11 @@ namespace SeatBattle.CSharp.GameBoard
                 cell.PreviousState = cell.State;
                 if (cell.IsValidForNewShip)
                 {
-                    Debug.WriteLine("ShipDrag");
                     cell.State = BoardCellState.ShipDrag;
                     cell.Invalidate();
                 }
                 else
                 {
-                    Debug.WriteLine("ShipDragInvalid");
                     cell.State = BoardCellState.ShipDragInvalid;
                     cell.Invalidate();
                 }
@@ -128,14 +124,14 @@ namespace SeatBattle.CSharp.GameBoard
             }
         }
 
-        void OnCellDragLeave(object sender, EventArgs e)
+        private void OnCellDragLeave(object sender, EventArgs e)
         {
             var cell = (BoardCell)sender;
             cell.State = cell.PreviousState;
             cell.Invalidate();
         }
 
-        void OnCellDragDrop(object sender, DragEventArgs e)
+        private void OnCellDragDrop(object sender, DragEventArgs e)
         {
             var cell = (BoardCell)sender;
             if (e.Data.GetDataPresent(typeof(BoardCell)))
@@ -158,7 +154,6 @@ namespace SeatBattle.CSharp.GameBoard
             }
             cell.Invalidate();
         }
-
 
         public Size CellSize { get { return new Size(25, 25); } }
 
@@ -188,113 +183,51 @@ namespace SeatBattle.CSharp.GameBoard
             }
         }
 
-    }
-
-    public enum BoardCellState
-    {
-        Normal,
-        MissedShot,
-        Ship,
-        ShotShip,
-        ShipDrag,
-        ShipDragInvalid
-    }
-
-    public class BoardCell : Label
-    {
-        private static readonly Color DefaultBorderColor = Color.CornflowerBlue;
-        private static readonly Color DefaultBackgroundColor = Color.LightBlue;
-
-        private static readonly Color DragOverBorderColor = Color.Orange;
-        private static readonly Color DragOverInvalidBorderColor = Color.Red;
-
-        private static readonly Color ShipColor = Color.Orange;
-
-        private const char ShipHitChar = (char)0x72;
-        private const char MissedHitChar = (char)0x3D;
-
-        public BoardCell()
+        private bool CanPlaceShip(Ship ship, int x, int y)
         {
-            base.AutoSize = false;
-            base.TextAlign = ContentAlignment.MiddleCenter;
-            base.BackColor = Color.LightBlue;
-            base.Font = new Font("Webdings", 10);
-            base.AllowDrop = true;
-        }
+            var wouldFit = true;
 
-        private BoardCellState _state;
-        public BoardCellState State
-        {
-            get
+            if (ship.Orientation == ShipOrientation.Horizontal)
             {
-                return _state;
+                wouldFit = (x + ship.Length) < BoardWidth;
             }
-            set
+            else
             {
-                _state = value;
-                OnCellStateChenged();
+                wouldFit = (y + ship.Length) < BoardHeight;
             }
+
+            return wouldFit;
         }
 
-        public BoardCellState PreviousState { get; set; }
-
-        public bool IsValidForNewShip { get; set; }
-
-        private void OnCellStateChenged()
+        private void DrawDragableShip(Ship ship, int x, int y)
         {
-            SuspendLayout();
-            switch (_state)
+            var state = CanPlaceShip(ship, x, y) ? BoardCellState.ShipDrag : BoardCellState.ShipDragInvalid;
+
+            var dx = x;
+            var dy = y;
+
+            for (var i = 0; i < ship.Length; i++)
             {
-                case BoardCellState.Normal:
-                    Text = string.Empty;
-                    BackColor = DefaultBackgroundColor;
-                    break;
-                case BoardCellState.MissedShot:
-                    Text = MissedHitChar.ToString();
-                    BackColor = DefaultBackgroundColor;
-                    break;
-                case BoardCellState.Ship:
-                    Text = string.Empty;
-                    BackColor = ShipColor;
-                    break;
-                case BoardCellState.ShotShip:
-                    Text = ShipHitChar.ToString();
-                    BackColor = ShipColor;
-                    break;
+                dx = ship.Orientation == ShipOrientation.Horizontal ? dx + 1 : dx;
+                dy = ship.Orientation == ShipOrientation.Vertical ? dy + 1 : dy;
             }
-            ResumeLayout();
+
+            if (dx >= BoardWidth || dy >= BoardHeight)
+                return;
+            
+            var cell = _cells[dx, dy];
+            cell.PreviousState = cell.State;
+            cell.State = state;
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+    
+
+        private void ClearDragableShip(Ship ship, int x, int y)
         {
-            base.OnPaint(e);
 
-            var borderColor = GetBorderColor();
-            Debug.WriteLine(borderColor);
-
-            using (var pen = new Pen(borderColor))
-            {
-                pen.Alignment = PenAlignment.Inset;
-                pen.DashStyle = DashStyle.Solid;
-
-                var rect = ClientRectangle;
-                rect.Height -= 1;
-                rect.Width -= 1;
-
-                e.Graphics.DrawRectangle(pen, rect);
-            }
         }
 
-        private Color GetBorderColor()
-        {
-            if (State == BoardCellState.ShipDrag)
-                return DragOverBorderColor;
 
-            if (State == BoardCellState.ShipDragInvalid)
-                return DragOverInvalidBorderColor;
-
-            return DefaultBorderColor;
-        }
 
     }
 }
