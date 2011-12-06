@@ -20,13 +20,46 @@ namespace SeatBattle.CSharp
 
         public bool IsLocatedAt(int x, int y)
         {
+            var rect = GetShipRegion();
+
+            return (x >= rect.X && x <= rect.Width && y >= rect.Y && y <= rect.Height);
+        }
+
+
+        public Rectangle GetShipRegion()
+        {
             var dx = Orientation == ShipOrientation.Horizontal ? Location.X + Length - 1 : Location.X;
             var dy = Orientation == ShipOrientation.Vertical ? Location.Y + Length - 1 : Location.Y;
 
-            return (x >= Location.X && x <= dx && y >= Location.Y && y <= dy);
+            return new Rectangle(Location, new Size(dx, dy));
+        }
+
+        public void MoveTo(int x, int y)
+        {
+            Location = new Point(x, y);
         }
     }
 
+    public class DraggableShip : Ship
+    {
+        private DraggableShip(int length) : base(length)
+        {
+        }
+
+        public Ship Source { get; private set; }
+
+        public static DraggableShip From(Ship ship)
+        {
+            var draggableShip = new DraggableShip(ship.Length)
+                                {
+                                    Location = ship.Location,
+                                    Orientation = ship.Orientation,
+                                    Source = ship
+                                };
+
+            return draggableShip;
+        }
+    }
 
 
     public enum ShipOrientation

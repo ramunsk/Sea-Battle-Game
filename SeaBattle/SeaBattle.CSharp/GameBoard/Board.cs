@@ -15,7 +15,7 @@ namespace SeatBattle.CSharp.GameBoard
         private readonly Label[] _rowHeaders;
         private readonly Label[] _columnHeaders;
         private readonly List<Ship> _ships;
-        private Ship _draggedShip;
+        private DraggableShip _draggedShip;
 
 
         public Board()
@@ -113,7 +113,7 @@ namespace SeatBattle.CSharp.GameBoard
             if (ship == null)
                 return;
 
-            _draggedShip = ship;
+            _draggedShip = DraggableShip.From(ship);
             cell.DoDragDrop(ship, DragDropEffects.Copy | DragDropEffects.Move);
         }
 
@@ -122,14 +122,13 @@ namespace SeatBattle.CSharp.GameBoard
 
             if (e.Data.GetDataPresent(typeof(Ship)))
             {
-                var ship = _draggedShip;
                 var cell = (BoardCell)sender;
+                _draggedShip.MoveTo(cell.X, cell.Y);
 
-                var canPlaceShip = CanPlaceShip(ship, cell.X, cell.Y);
+                var canPlaceShip = CanPlaceShip(_draggedShip, cell.X, cell.Y);
                 var state = canPlaceShip ? BoardCellState.ShipDrag : BoardCellState.ShipDragInvalid;
 
-                DrawDragableShip(ship, cell.X, cell.Y, state);
-                
+                DrawShip(_draggedShip, state);
                 
                 e.Effect = canPlaceShip ? DragDropEffects.Move : DragDropEffects.None;
             }
@@ -142,7 +141,13 @@ namespace SeatBattle.CSharp.GameBoard
         private void OnCellDragLeave(object sender, EventArgs e)
         {
             var cell = (BoardCell)sender;
-            ClearDragableShip(_draggedShip, cell.X, cell.Y);
+            var x1 = cell.X;
+            var y1 = cell.Y;
+            var x2 = _draggedShip.Orientation == ShipOrientation.Horizontal ? x1 + _draggedShip.Length - 1 : x1;
+            var y2 = _draggedShip.Orientation == ShipOrientation.Vertical ? y1 + _draggedShip.Length - 1 : y1;
+
+            RedrawRegion(x1, y1, x2, y2);
+
         }
 
         private void OnCellDragDrop(object sender, DragEventArgs e)
@@ -150,7 +155,11 @@ namespace SeatBattle.CSharp.GameBoard
             var cell = (BoardCell)sender;
             if (e.Data.GetDataPresent(typeof(Ship)))
             {
+                if (!CanPlaceShip(_draggedShip, cell.X, cell.Y))
+                    return;
 
+                MoveShip(_draggedShip.Source, cell.X, cell.Y);
+                _draggedShip = null;
             }
             else
             {
@@ -163,24 +172,12 @@ namespace SeatBattle.CSharp.GameBoard
 
         public void AddShip(Ship ship, int x, int y)
         {
-
-            for (var i = 0; i < ship.Length; i++)
-            {
-                var dx = ship.Orientation == ShipOrientation.Horizontal ? x + i : x;
-                var dy = ship.Orientation == ShipOrientation.Horizontal ? y : y + i;
-                _cells[dx, dy].State = BoardCellState.Ship;
-
-                //for (var j = 0; j < 3; j++)
-                //{
-                //    for (var k = 0; k < 3; k++)
-                //    {
-                //        if (j >= 0 && j <= 9 && k >= 0 && k <= 9)
-                //            _cells[j, k].IsValidForNewShip = false;
-                //    }
-                //}
-            }
+            if (!CanPlaceShip(ship, x, y))
+                throw new InvalidOperationException("Cannot place ship at a given location");
+            
             ship.Location = new Point(x, y);
             _ships.Add(ship);
+            DrawShip(ship);
         }
 
         private bool CanPlaceShip(Ship ship, int x, int y)
@@ -199,49 +196,62 @@ namespace SeatBattle.CSharp.GameBoard
             return wouldFit;
         }
 
-        private void DrawDragableShip(Ship ship, int x, int y, BoardCellState state)
+        private void RedrawRegion(int x1, int y1, int x2, int y2)
         {
-            var dx = x;
-            var dy = y;
-
-            for (var i = 0; i < ship.Length; i++)
+            SuspendLayout();
+            for (var x = x1; x <= x2; x++)
             {
-                dx = ship.Orientation == ShipOrientation.Horizontal ? x + i : dx;
-                dy = ship.Orientation == ShipOrientation.Vertical ? y + i : dy;
-                //_cells[dx, dy].State = state;
+                for (var y = y1; y <= y2; y++)
+                {
+                    if (x >= BoardWidth || y >= BoardHeight)
+                    {
+                        continue;
+                    }
 
-                Debug.WriteLine("x={0}, y={1}", dx, dy);
-
-                if (dx >= BoardWidth || dy >= BoardHeight)
-                    return;
-
-                var cell = _cells[dx, dy];
-                cell.State = state;
+                    var ship = GetShipAt(x, y);
+                    _cells[x, y].State = ship == null ? BoardCellState.Normal : BoardCellState.Ship;
+                    _cells[x, y].Invalidate();
+                }
             }
-        }
-
-        private void ClearDragableShip(Ship ship, int x, int y)
-        {
-            var dx = x;
-            var dy = y;
-
-            for (var i = 0; i < ship.Length; i++)
-            {
-                dx = ship.Orientation == ShipOrientation.Horizontal ? x + i : dx;
-                dy = ship.Orientation == ShipOrientation.Vertical ? y + i : dy;
-                //_cells[dx, dy].State = state;
-
-                Debug.WriteLine("x={0}, y={1}", dx, dy);
-
-                if (dx >= BoardWidth || dy >= BoardHeight)
-                    return;
-
-                var cell = _cells[dx, dy];
-                cell.RestorePreviousState();
-            }
+            ResumeLayout();
         }
 
 
+        private void DrawShip(Ship ship)
+        {
+            DrawShip(ship, BoardCellState.Ship);
+        }
 
+
+        private void DrawShip(Ship ship, BoardCellState state)
+        {
+            SuspendLayout();
+            var rect = ship.GetShipRegion();
+
+            for (var dx = rect.X; dx <= rect.Width; dx++)
+            {
+                for (var dy = rect.Y; dy <= rect.Height; dy++)
+                {
+                    if (dx < BoardWidth && dy < BoardHeight)
+                    {
+                        var cell = _cells[dx, dy];
+                        cell.State = state;
+                        cell.Invalidate();
+                    }
+                }
+            }
+            ResumeLayout();
+        }
+
+        private void MoveShip(Ship ship, int x, int y)
+        {
+            var rect = ship.GetShipRegion();
+            _ships.Remove(ship);
+            RedrawRegion(rect.X, rect.Y, rect.Right, rect.Bottom);
+
+
+            //ship.Location = new Point(x, y);
+            AddShip(ship, x, y);
+        }
     }
 }
