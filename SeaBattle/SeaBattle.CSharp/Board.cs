@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
-namespace SeatBattle.CSharp.GameBoard
+namespace SeatBattle.CSharp
 {
     public class Board : Control
     {
@@ -97,16 +98,12 @@ namespace SeatBattle.CSharp.GameBoard
 
         private Ship GetShipAt(int x, int y)
         {
-            foreach (var ship in _ships)
-            {
-                if (ship.IsLocatedAt(x, y))
-                    return ship;
-            }
-            return null;
+            return _ships.FirstOrDefault(ship => ship.IsLocatedAt(x, y));
         }
 
         private void OnCellMouseDown(object sender, MouseEventArgs e)
         {
+            Debug.WriteLine("MouseDown");
             var cell = (BoardCell)sender;
             var ship = GetShipAt(cell.X, cell.Y);
 
@@ -119,6 +116,11 @@ namespace SeatBattle.CSharp.GameBoard
 
         private void OnCellDragEnter(object sender, DragEventArgs e)
         {
+
+            if ((e.KeyState & 8)==8)
+            {
+                Debug.WriteLine("Rotate");
+            }
 
             if (e.Data.GetDataPresent(typeof(Ship)))
             {
@@ -140,13 +142,8 @@ namespace SeatBattle.CSharp.GameBoard
 
         private void OnCellDragLeave(object sender, EventArgs e)
         {
-            var cell = (BoardCell)sender;
-            var x1 = cell.X;
-            var y1 = cell.Y;
-            var x2 = _draggedShip.Orientation == ShipOrientation.Horizontal ? x1 + _draggedShip.Length - 1 : x1;
-            var y2 = _draggedShip.Orientation == ShipOrientation.Vertical ? y1 + _draggedShip.Length - 1 : y1;
-
-            RedrawRegion(x1, y1, x2, y2);
+            var rect = _draggedShip.GetShipRegion();
+            RedrawRegion(rect);
 
         }
 
@@ -177,12 +174,12 @@ namespace SeatBattle.CSharp.GameBoard
             
             ship.Location = new Point(x, y);
             _ships.Add(ship);
-            DrawShip(ship);
+            DrawShip(ship, BoardCellState.Ship);
         }
 
         private bool CanPlaceShip(Ship ship, int x, int y)
         {
-            var wouldFit = true;
+            bool wouldFit;
 
             if (ship.Orientation == ShipOrientation.Horizontal)
             {
@@ -196,12 +193,12 @@ namespace SeatBattle.CSharp.GameBoard
             return wouldFit;
         }
 
-        private void RedrawRegion(int x1, int y1, int x2, int y2)
+        private void RedrawRegion(Rectangle region)
         {
             SuspendLayout();
-            for (var x = x1; x <= x2; x++)
+            for (var x = region.X; x <= region.Right; x++)
             {
-                for (var y = y1; y <= y2; y++)
+                for (var y = region.Y; y <= region.Bottom; y++)
                 {
                     if (x >= BoardWidth || y >= BoardHeight)
                     {
@@ -214,12 +211,6 @@ namespace SeatBattle.CSharp.GameBoard
                 }
             }
             ResumeLayout();
-        }
-
-
-        private void DrawShip(Ship ship)
-        {
-            DrawShip(ship, BoardCellState.Ship);
         }
 
 
@@ -247,11 +238,23 @@ namespace SeatBattle.CSharp.GameBoard
         {
             var rect = ship.GetShipRegion();
             _ships.Remove(ship);
-            RedrawRegion(rect.X, rect.Y, rect.Right, rect.Bottom);
+            RedrawRegion(rect);
 
 
             //ship.Location = new Point(x, y);
             AddShip(ship, x, y);
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            Debug.WriteLine("KeyDown");
+            base.OnKeyDown(e);
+            if (_draggedShip == null)
+                return;
+            
+            if (e.Modifiers == Keys.None && e.KeyCode == Keys.Space)
+                _draggedShip.Orientation = _draggedShip.Orientation == ShipOrientation.Horizontal ? ShipOrientation.Vertical : ShipOrientation.Horizontal;
+
         }
     }
 }

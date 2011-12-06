@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-namespace SeatBattle.CSharp.GameBoard
+namespace SeatBattle.CSharp
 {
     [DebuggerDisplay("({X},{Y}) {_state}")]
     public class BoardCell : Label

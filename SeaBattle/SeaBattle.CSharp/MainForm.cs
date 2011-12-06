@@ -1,13 +1,13 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace SeatBattle.CSharp.GameBoard
+namespace SeatBattle.CSharp
 {
-    public class GameBoard : Form
+    public class MainForm : Form
     {
         private readonly Board _humanBoard;
 
-        public GameBoard()
+        public MainForm()
         {
             SuspendLayout();
             
@@ -17,10 +17,10 @@ namespace SeatBattle.CSharp.GameBoard
 
             ResumeLayout();
 
-            DoubleClick += GameBoard_DoubleClick;
+            DoubleClick += OnDoubleClick;
         }
 
-        void GameBoard_DoubleClick(object sender, System.EventArgs e)
+        void OnDoubleClick(object sender, System.EventArgs e)
         {
             _humanBoard.AddShip(new Ship(4) {Orientation = ShipOrientation.Horizontal}, 6, 9);
         }

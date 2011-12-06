@@ -1,4 +1,4 @@
-namespace SeatBattle.CSharp.GameBoard
+namespace SeatBattle.CSharp
 {
     public enum BoardCellState
     {
