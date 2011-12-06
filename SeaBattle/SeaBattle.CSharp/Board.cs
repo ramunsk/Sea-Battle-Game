@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using System.Windows.Input;
+using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace SeatBattle.CSharp
 {
@@ -17,6 +19,7 @@ namespace SeatBattle.CSharp
         private readonly Label[] _columnHeaders;
         private readonly List<Ship> _ships;
         private DraggableShip _draggedShip;
+        private bool _shipOrientationModified;
 
 
         public Board()
@@ -91,8 +94,29 @@ namespace SeatBattle.CSharp
                     cell.DragEnter += OnCellDragEnter;
                     cell.DragLeave += OnCellDragLeave;
                     cell.DragDrop += OnCellDragDrop;
+                    cell.QueryContinueDrag += OnCellQueryContinueDrag;
                     Controls.Add(cell);
                 }
+            }
+        }
+
+        private void OnCellQueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && !_shipOrientationModified)
+            {
+                var rect = _draggedShip.GetShipRegion();
+                RedrawRegion(rect);
+                _draggedShip.Rotate();
+                _shipOrientationModified = true;
+                DrawShip(_draggedShip, BoardCellState.ShipDrag);
+            }
+            else if (Keyboard.IsKeyUp(Key.LeftCtrl) && _shipOrientationModified)
+            {
+                var rect = _draggedShip.GetShipRegion();
+                RedrawRegion(rect);
+                _draggedShip.Rotate();
+                _shipOrientationModified = false;
+                DrawShip(_draggedShip, BoardCellState.ShipDrag);
             }
         }
 
@@ -103,7 +127,6 @@ namespace SeatBattle.CSharp
 
         private void OnCellMouseDown(object sender, MouseEventArgs e)
         {
-            Debug.WriteLine("MouseDown");
             var cell = (BoardCell)sender;
             var ship = GetShipAt(cell.X, cell.Y);
 
@@ -116,12 +139,7 @@ namespace SeatBattle.CSharp
 
         private void OnCellDragEnter(object sender, DragEventArgs e)
         {
-
-            if ((e.KeyState & 8)==8)
-            {
-                Debug.WriteLine("Rotate");
-            }
-
+            Debug.WriteLine("OnCellDragEnter");
             if (e.Data.GetDataPresent(typeof(Ship)))
             {
                 var cell = (BoardCell)sender;
@@ -142,6 +160,7 @@ namespace SeatBattle.CSharp
 
         private void OnCellDragLeave(object sender, EventArgs e)
         {
+            Debug.WriteLine("OnCellDragLeave");
             var rect = _draggedShip.GetShipRegion();
             RedrawRegion(rect);
 
@@ -149,20 +168,25 @@ namespace SeatBattle.CSharp
 
         private void OnCellDragDrop(object sender, DragEventArgs e)
         {
+            Debug.WriteLine("OnCellDragDrop");
             var cell = (BoardCell)sender;
             if (e.Data.GetDataPresent(typeof(Ship)))
             {
                 if (!CanPlaceShip(_draggedShip, cell.X, cell.Y))
                     return;
+                var ship = _draggedShip.Source;
+                ship.Orientation = _draggedShip.Orientation;
 
-                MoveShip(_draggedShip.Source, cell.X, cell.Y);
+                MoveShip(ship, cell.X, cell.Y);
                 _draggedShip = null;
+                
             }
             else
             {
                 e.Effect = DragDropEffects.None;
             }
             cell.Invalidate();
+            _shipOrientationModified = false;
         }
 
         public Size CellSize { get { return new Size(25, 25); } }
@@ -213,7 +237,6 @@ namespace SeatBattle.CSharp
             ResumeLayout();
         }
 
-
         private void DrawShip(Ship ship, BoardCellState state)
         {
             SuspendLayout();
@@ -245,16 +268,6 @@ namespace SeatBattle.CSharp
             AddShip(ship, x, y);
         }
 
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            Debug.WriteLine("KeyDown");
-            base.OnKeyDown(e);
-            if (_draggedShip == null)
-                return;
-            
-            if (e.Modifiers == Keys.None && e.KeyCode == Keys.Space)
-                _draggedShip.Orientation = _draggedShip.Orientation == ShipOrientation.Horizontal ? ShipOrientation.Vertical : ShipOrientation.Horizontal;
 
-        }
     }
 }

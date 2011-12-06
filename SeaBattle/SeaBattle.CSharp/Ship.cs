@@ -38,6 +38,11 @@ namespace SeatBattle.CSharp
         {
             Location = new Point(x, y);
         }
+
+        public void Rotate()
+        {
+            Orientation = Orientation == ShipOrientation.Horizontal ? ShipOrientation.Vertical : ShipOrientation.Horizontal;
+        }
     }
 
     public class DraggableShip : Ship
