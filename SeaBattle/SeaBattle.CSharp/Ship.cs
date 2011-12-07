@@ -28,10 +28,10 @@ namespace SeatBattle.CSharp
 
         public Rectangle GetShipRegion()
         {
-            var dx = Math.Abs(Location.X) + (Orientation == ShipOrientation.Horizontal ? Length - 1 : 0);
-            var dy = Math.Abs(Location.Y) + (Orientation == ShipOrientation.Vertical ? Length - 1 : 0);
+            var width = Orientation == ShipOrientation.Horizontal ? Length : 1;
+            var height = Orientation == ShipOrientation.Vertical ? Length : 1;
 
-            return new Rectangle(Location, new Size(dx, dy));
+            return new Rectangle(Location, new Size(width, height));
         }
 
         public bool IsInRegion(Rectangle rect)
@@ -50,6 +50,8 @@ namespace SeatBattle.CSharp
         {
             Orientation = Orientation == ShipOrientation.Horizontal ? ShipOrientation.Vertical : ShipOrientation.Horizontal;
         }
+
+        
 
 
     }

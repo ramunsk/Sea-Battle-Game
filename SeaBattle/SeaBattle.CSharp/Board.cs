@@ -13,6 +13,7 @@ namespace SeatBattle.CSharp
     {
         private const int BoardHeight = 10;
         private const int BoardWidth = 10;
+        private static readonly Rectangle BoardRegion = new Rectangle(0, 0, 9, 9);
 
         private readonly BoardCell[,] _cells;
         private readonly Label[] _rowHeaders;
@@ -203,22 +204,18 @@ namespace SeatBattle.CSharp
 
         private bool CanPlaceShip(Ship ship, int x, int y)
         {
+            var shipRegion = ship.GetShipRegion();
 
-            var r = ship.GetShipRegion();
+            shipRegion.Location = new Point(x, y);
 
-            r.Location = new Point(x, y);
-
-            if (r.Right >= BoardWidth || r.Bottom >= BoardHeight)
+            if (!BoardRegion.Contains(shipRegion))
                 return false;
 
-
-            r.Inflate(1, 1);
-
-
+            shipRegion.Inflate(1, 1);
 
             foreach (var s in _ships)
             {
-                if (s.GetShipRegion().IntersectsWith(r))
+                if (s.GetShipRegion().IntersectsWith(shipRegion))
                     return false;
             }
 
@@ -317,8 +314,10 @@ namespace SeatBattle.CSharp
                 var retries = 0;
                 while (!shipPlaced && retries < 10)
                 {
-                    var x = rnd.Next(11);
-                    var y = rnd.Next(11);
+                    var x = rnd.Next(10);
+                    var y = rnd.Next(10);
+
+                    Debug.WriteLine("Placing ship (length={0}, orientation={3}) at x={1}, y={2}", ship.Length, x, y, ship.Orientation);
 
                     if (CanPlaceShip(ship, x, y))
                     {
@@ -326,6 +325,7 @@ namespace SeatBattle.CSharp
                         shipPlaced = true;
                         shipsPlaced++;
                         Refresh();
+                        Debug.WriteLine("PLACED AT WHILE");
                         continue;
                     }
                     retries++;
@@ -345,6 +345,7 @@ namespace SeatBattle.CSharp
                             shipsPlaced++;
                             shipPlaced = true;
                             Refresh();
+                            Debug.WriteLine("PLACED AT FOR");
                             break;
                             
                         }
