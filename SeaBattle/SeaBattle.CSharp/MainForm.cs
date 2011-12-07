@@ -17,12 +17,17 @@ namespace SeatBattle.CSharp
 
             ResumeLayout();
 
+            //_humanBoard.AddShip(new Ship(4) { Orientation = ShipOrientation.Horizontal }, 6, 9);
+            //_humanBoard.AddShip(new Ship(1) {Orientation = ShipOrientation.Vertical}, 0, 0);
+            //_humanBoard.AddShip(new Ship(3) { Orientation = ShipOrientation.Vertical }, 5, 5);
+
             DoubleClick += OnDoubleClick;
         }
 
         void OnDoubleClick(object sender, System.EventArgs e)
         {
-            _humanBoard.AddShip(new Ship(4) {Orientation = ShipOrientation.Horizontal}, 6, 9);
+            _humanBoard.ClearBoard();
+            _humanBoard.AddRandomShips();
         }
 
         private void CreateWindowlayout()

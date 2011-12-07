@@ -5,37 +5,58 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeaBattle.CSharp", "SeaBatt
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SeaBattle.Cpp", "SeaBattle.Cpp\SeaBattle.Cpp.vcxproj", "{148EE226-4BDC-4939-8A79-32C45B8DA9F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeaBattle.CSharp.Tests", "SeaBattle.CSharp.Tests\SeaBattle.CSharp.Tests.csproj", "{35697CF5-87F5-4929-9AF0-5C6DB54BF841}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
 		Debug|Win32 = Debug|Win32
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|Mixed Platforms = Release|Mixed Platforms
 		Release|Win32 = Release|Win32
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}.Debug|Win32.ActiveCfg = Debug|x86
 		{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}.Debug|x86.ActiveCfg = Debug|x86
 		{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}.Debug|x86.Build.0 = Debug|x86
+		{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}.Release|Any CPU.ActiveCfg = Release|x86
 		{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}.Release|Mixed Platforms.Build.0 = Release|x86
 		{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}.Release|Win32.ActiveCfg = Release|x86
 		{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}.Release|x86.ActiveCfg = Release|x86
 		{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}.Release|x86.Build.0 = Release|x86
+		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Debug|Win32.ActiveCfg = Debug|Win32
 		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Debug|Win32.Build.0 = Debug|Win32
 		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Debug|x86.ActiveCfg = Debug|Win32
 		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Debug|x86.Build.0 = Debug|Win32
+		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Release|Any CPU.ActiveCfg = Release|Win32
 		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Release|Mixed Platforms.ActiveCfg = Release|Win32
 		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Release|Win32.ActiveCfg = Release|Win32
 		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Release|Win32.Build.0 = Release|Win32
 		{148EE226-4BDC-4939-8A79-32C45B8DA9F8}.Release|x86.ActiveCfg = Release|Win32
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Debug|x86.Build.0 = Debug|Any CPU
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Release|Win32.ActiveCfg = Release|Any CPU
+		{35697CF5-87F5-4929-9AF0-5C6DB54BF841}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

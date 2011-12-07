@@ -33,6 +33,9 @@ namespace SeatBattle.CSharp
             base.AllowDrop = true;
         }
 
+        public bool IsOccupied { get; set; }
+
+
         public BoardCellState State
         {
             get

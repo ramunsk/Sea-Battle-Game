@@ -149,7 +149,7 @@ namespace SeatBattle.CSharp
                 var state = canPlaceShip ? BoardCellState.ShipDrag : BoardCellState.ShipDragInvalid;
 
                 DrawShip(_draggedShip, state);
-                
+
                 e.Effect = canPlaceShip ? DragDropEffects.Move : DragDropEffects.None;
             }
             else
@@ -179,7 +179,7 @@ namespace SeatBattle.CSharp
 
                 MoveShip(ship, cell.X, cell.Y);
                 _draggedShip = null;
-                
+
             }
             else
             {
@@ -195,7 +195,7 @@ namespace SeatBattle.CSharp
         {
             if (!CanPlaceShip(ship, x, y))
                 throw new InvalidOperationException("Cannot place ship at a given location");
-            
+
             ship.Location = new Point(x, y);
             _ships.Add(ship);
             DrawShip(ship, BoardCellState.Ship);
@@ -203,18 +203,26 @@ namespace SeatBattle.CSharp
 
         private bool CanPlaceShip(Ship ship, int x, int y)
         {
-            bool wouldFit;
 
-            if (ship.Orientation == ShipOrientation.Horizontal)
+            var r = ship.GetShipRegion();
+
+            r.Location = new Point(x, y);
+
+            if (r.Right >= BoardWidth || r.Bottom >= BoardHeight)
+                return false;
+
+
+            r.Inflate(1, 1);
+
+
+
+            foreach (var s in _ships)
             {
-                wouldFit = (x + ship.Length) <= BoardWidth;
-            }
-            else
-            {
-                wouldFit = (y + ship.Length) <= BoardHeight;
+                if (s.GetShipRegion().IntersectsWith(r))
+                    return false;
             }
 
-            return wouldFit;
+            return true;
         }
 
         private void RedrawRegion(Rectangle region)
@@ -268,6 +276,82 @@ namespace SeatBattle.CSharp
             AddShip(ship, x, y);
         }
 
+        public void ClearBoard()
+        {
+            SuspendLayout();
+            _ships.Clear();
+            for (int i = 0; i < BoardWidth; i++)
+            {
+                for (int j = 0; j < BoardHeight; j++)
+                {
+                    _cells[i, j].State = BoardCellState.Normal;
+                    _cells[i, j].IsOccupied = false;
+                }
+            }
+            ResumeLayout();
+        }
 
+        public void AddRandomShips()
+        {
+            var rnd = new Random(DateTime.Now.Millisecond);
+            var ships = new List<Ship>
+                        {
+                            new Ship(4){Orientation = (ShipOrientation)rnd.Next(2)},
+                            new Ship(3){Orientation = (ShipOrientation)rnd.Next(2)},
+                            new Ship(3){Orientation = (ShipOrientation)rnd.Next(2)},
+                            new Ship(2){Orientation = (ShipOrientation)rnd.Next(2)},
+                            new Ship(2){Orientation = (ShipOrientation)rnd.Next(2)},
+                            new Ship(2){Orientation = (ShipOrientation)rnd.Next(2)},
+                            new Ship(1){Orientation = (ShipOrientation)rnd.Next(2)},
+                            new Ship(1){Orientation = (ShipOrientation)rnd.Next(2)},
+                            new Ship(1){Orientation = (ShipOrientation)rnd.Next(2)},
+                            new Ship(1){Orientation = (ShipOrientation)rnd.Next(2)}
+                        };
+
+            var shipsPlaced = 0;
+
+
+            foreach (var ship in ships)
+            {
+                var shipPlaced = false;
+                var retries = 0;
+                while (!shipPlaced && retries < 10)
+                {
+                    var x = rnd.Next(11);
+                    var y = rnd.Next(11);
+
+                    if (CanPlaceShip(ship, x, y))
+                    {
+                        AddShip(ship, x, y);
+                        shipPlaced = true;
+                        shipsPlaced++;
+                        Refresh();
+                        continue;
+                    }
+                    retries++;
+                }
+                for (int i = 0; i < BoardWidth; i++)
+                {
+                    if (shipPlaced)
+                        break;
+
+                    for (int j = 0; j < BoardHeight; j++)
+                    {
+                        if (shipPlaced)
+                            break;
+                        if (CanPlaceShip(ship, i, j))
+                        {
+                            AddShip(ship, i, j);
+                            shipsPlaced++;
+                            shipPlaced = true;
+                            Refresh();
+                            break;
+                            
+                        }
+                    }
+                }
+            }
+
+        }
     }
 }

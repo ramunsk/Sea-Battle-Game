@@ -5,7 +5,7 @@ using System.Drawing;
 
 namespace SeatBattle.CSharp
 {
-    [DebuggerDisplay("({Location.X},{Location.Y}) {Orientation}")]
+    [DebuggerDisplay("({Location.X},{Location.Y}) {Orientation} x{Length}")]
     public class Ship
     {
         public Point Location { get; set; }
@@ -28,11 +28,18 @@ namespace SeatBattle.CSharp
 
         public Rectangle GetShipRegion()
         {
-            var dx = Orientation == ShipOrientation.Horizontal ? Location.X + Length - 1 : Location.X;
-            var dy = Orientation == ShipOrientation.Vertical ? Location.Y + Length - 1 : Location.Y;
+            var dx = Math.Abs(Location.X) + (Orientation == ShipOrientation.Horizontal ? Length - 1 : 0);
+            var dy = Math.Abs(Location.Y) + (Orientation == ShipOrientation.Vertical ? Length - 1 : 0);
 
             return new Rectangle(Location, new Size(dx, dy));
         }
+
+        public bool IsInRegion(Rectangle rect)
+        {
+            var r = GetShipRegion();
+            return (rect.IntersectsWith(r));
+        }
+
 
         public void MoveTo(int x, int y)
         {
@@ -43,11 +50,14 @@ namespace SeatBattle.CSharp
         {
             Orientation = Orientation == ShipOrientation.Horizontal ? ShipOrientation.Vertical : ShipOrientation.Horizontal;
         }
+
+
     }
 
     public class DraggableShip : Ship
     {
-        private DraggableShip(int length) : base(length)
+        private DraggableShip(int length)
+            : base(length)
         {
         }
 
@@ -112,7 +122,7 @@ namespace SeatBattle.CSharp
 
         public void RandomizeShips()
         {
-            foreach(var ship in Ships)
+            foreach (var ship in Ships)
             {
                 ship.Location = new RandomPoint().ToPoint();
             }
