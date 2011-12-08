@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace SeatBattle.CSharp
 {
+    [DebuggerDisplay("({X},{Y}) {Width}x{Height}")]
     public class Rect
     {
         private int _width;
@@ -20,19 +22,6 @@ namespace SeatBattle.CSharp
         public int X { get; set; }
 
         public int Y { get; set; }
-
-        public Point Location
-        {
-            get
-            {
-                return new Point(X, Y);
-            }
-            set
-            {
-                X = value.X;
-                Y = value.Y;
-            }
-        }
 
         public int Width
         {
@@ -85,6 +74,12 @@ namespace SeatBattle.CSharp
         public bool IntersectsWith(Rect rect)
         {
             return X < rect.Right && Right > rect.X && Y < rect.Height && Height > Y;
+        }
+
+        public void MoveTo(int x, int y)
+        {
+            X = x;
+            Y = y;
         }
     }
 }

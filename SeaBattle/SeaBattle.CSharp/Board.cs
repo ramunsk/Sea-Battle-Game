@@ -13,7 +13,7 @@ namespace SeatBattle.CSharp
     {
         private const int BoardHeight = 10;
         private const int BoardWidth = 10;
-        private static readonly Rect BoardRegion = new Rect(0, 0, 9, 9);
+        private static readonly Rect BoardRegion = new Rect(0, 0, 10, 10);
 
         private readonly BoardCell[,] _cells;
         private readonly Label[] _rowHeaders;
@@ -207,7 +207,7 @@ namespace SeatBattle.CSharp
         {
             var shipRegion = ship.GetShipRegion();
 
-            shipRegion.Location = new Point(x, y);
+            shipRegion.MoveTo(x, y);
 
             if (!BoardRegion.Contains(shipRegion))
                 return false;
