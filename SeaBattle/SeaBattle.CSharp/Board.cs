@@ -13,7 +13,7 @@ namespace SeatBattle.CSharp
     {
         private const int BoardHeight = 10;
         private const int BoardWidth = 10;
-        private static readonly Rectangle BoardRegion = new Rectangle(0, 0, 9, 9);
+        private static readonly Rect BoardRegion = new Rect(0, 0, 9, 9);
 
         private readonly BoardCell[,] _cells;
         private readonly Label[] _rowHeaders;
@@ -197,7 +197,8 @@ namespace SeatBattle.CSharp
             if (!CanPlaceShip(ship, x, y))
                 throw new InvalidOperationException("Cannot place ship at a given location");
 
-            ship.Location = new Point(x, y);
+            ship.X = x;
+            ship.Y = y;
             _ships.Add(ship);
             DrawShip(ship, BoardCellState.Ship);
         }
@@ -222,7 +223,7 @@ namespace SeatBattle.CSharp
             return true;
         }
 
-        private void RedrawRegion(Rectangle region)
+        private void RedrawRegion(Rect region)
         {
             SuspendLayout();
             for (var x = region.X; x <= region.Right; x++)

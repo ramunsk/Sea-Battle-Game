@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 
 namespace SeatBattle.CSharp
 {
     [DebuggerDisplay("({Location.X},{Location.Y}) {Orientation} x{Length}")]
     public class Ship
     {
-        public Point Location { get; set; }
         public int Length { get; set; }
         public ShipOrientation Orientation { get; set; }
 
         public Ship(int length)
         {
             Length = length;
-            Location = new Point(-1, -1);
         }
 
         public bool IsLocatedAt(int x, int y)
@@ -26,15 +23,15 @@ namespace SeatBattle.CSharp
         }
 
 
-        public Rectangle GetShipRegion()
+        public Rect GetShipRegion()
         {
             var width = Orientation == ShipOrientation.Horizontal ? Length : 1;
             var height = Orientation == ShipOrientation.Vertical ? Length : 1;
 
-            return new Rectangle(Location, new Size(width, height));
+            return new Rect(X, Y, width, height);
         }
 
-        public bool IsInRegion(Rectangle rect)
+        public bool IsInRegion(Rect rect)
         {
             var r = GetShipRegion();
             return (rect.IntersectsWith(r));
@@ -43,7 +40,8 @@ namespace SeatBattle.CSharp
 
         public void MoveTo(int x, int y)
         {
-            Location = new Point(x, y);
+            X = x;
+            Y = y;
         }
 
         public void Rotate()
@@ -51,7 +49,8 @@ namespace SeatBattle.CSharp
             Orientation = Orientation == ShipOrientation.Horizontal ? ShipOrientation.Vertical : ShipOrientation.Horizontal;
         }
 
-        
+        public int X { get; set; }
+        public int Y { get; set; }
 
 
     }
@@ -69,7 +68,8 @@ namespace SeatBattle.CSharp
         {
             var draggableShip = new DraggableShip(ship.Length)
                                 {
-                                    Location = ship.Location,
+                                    X = ship.X,
+                                    Y = ship.Y,
                                     Orientation = ship.Orientation,
                                     Source = ship
                                 };
@@ -97,10 +97,10 @@ namespace SeatBattle.CSharp
             Y = r.Next(1, 10);
         }
 
-        public Point ToPoint()
-        {
-            return new Point(X, Y);
-        }
+        //public Point ToPoint()
+        //{
+        //    return new Point(X, Y);
+        //}
     }
 
     public class Player
@@ -122,12 +122,12 @@ namespace SeatBattle.CSharp
         }
 
 
-        public void RandomizeShips()
-        {
-            foreach (var ship in Ships)
-            {
-                ship.Location = new RandomPoint().ToPoint();
-            }
-        }
+        //public void RandomizeShips()
+        //{
+        //    foreach (var ship in Ships)
+        //    {
+        //        ship.Location = new RandomPoint().ToPoint();
+        //    }
+        //}
     }
 }

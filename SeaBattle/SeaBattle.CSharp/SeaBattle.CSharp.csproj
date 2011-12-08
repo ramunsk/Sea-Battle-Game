@@ -75,6 +75,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Rect.cs" />
     <Compile Include="Ship.cs" />
   </ItemGroup>
   <ItemGroup>
