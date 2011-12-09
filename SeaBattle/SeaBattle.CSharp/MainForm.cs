@@ -28,6 +28,10 @@ namespace SeatBattle.CSharp
         {
             _humanBoard.ClearBoard();
             _humanBoard.AddRandomShips();
+
+
+            //var ship = new Ship(4) {Orientation = ShipOrientation.Horizontal};
+            //_humanBoard.AddShip(ship, 5, 5);
         }
 
         private void CreateWindowlayout()
@@ -38,6 +42,7 @@ namespace SeatBattle.CSharp
             Font = new Font("Calibri", 10, FontStyle.Regular, GraphicsUnit.Point, 186);
             Margin = new Padding(4, 4, 4, 4);
             Text = "SeaBattle.CSharp";
+            BackColor = Color.FromArgb(235, 235, 235);
         }
     }
 }

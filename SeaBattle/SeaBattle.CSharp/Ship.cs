@@ -19,7 +19,7 @@ namespace SeatBattle.CSharp
         {
             var rect = GetShipRegion();
 
-            return (x >= rect.X && x <= rect.Width && y >= rect.Y && y <= rect.Height);
+            return (x >= rect.X && x <= rect.Right && y >= rect.Y && y <= rect.Bottom);
         }
 
 

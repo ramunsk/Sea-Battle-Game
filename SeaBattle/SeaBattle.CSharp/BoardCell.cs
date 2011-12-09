@@ -8,11 +8,11 @@ namespace SeatBattle.CSharp
     [DebuggerDisplay("({X},{Y}) {_state}")]
     public class BoardCell : Label
     {
-        private static readonly Color DefaultBorderColor = Color.CornflowerBlue;
-        private static readonly Color DefaultBackgroundColor = Color.LightBlue;
-        private static readonly Color DragOverBorderColor = Color.Orange;
-        private static readonly Color DragOverInvalidBorderColor = Color.Red;
-        private static readonly Color ShipColor = Color.Orange;
+        private static readonly Color DefaultBorderColor = Color.FromArgb(214,214,214);
+        private static readonly Color DefaultBackgroundColor = Color.FromArgb(222,222,222);
+        private static readonly Color DragOverBackgroundColor = Color.FromArgb(255,174,0);
+        private static readonly Color DragOverInvalidBackgroundColor = Color.FromArgb(222,0,0);
+        private static readonly Color ShipColor = Color.FromArgb(65,133,243);
 
         private const char ShipHitChar = (char)0x72;
         private const char MissedHitChar = (char)0x3D;
@@ -20,7 +20,6 @@ namespace SeatBattle.CSharp
 
 
         private BoardCellState _state;
-        private BoardCellState _previousState;
 
         public BoardCell(int x, int y)
         {
@@ -44,18 +43,10 @@ namespace SeatBattle.CSharp
             }
             set
             {
-                _previousState = _state;
                 _state = value;
                 OnCellStateChenged();
             }
         }
-
-        public void RestorePreviousState()
-        {
-            State = _previousState;
-        }
-
-        //public bool IsValidForNewShip { get; set; }
 
         private void OnCellStateChenged()
         {
@@ -79,11 +70,11 @@ namespace SeatBattle.CSharp
                     BackColor = ShipColor;
                     break;
                 case BoardCellState.ShipDrag:
-                    BackColor = DefaultBackgroundColor;
+                    BackColor = DragOverBackgroundColor;
                     Text = string.Empty;
                     break;
                 case BoardCellState.ShipDragInvalid:
-                    BackColor = DefaultBackgroundColor;
+                    BackColor = DragOverInvalidBackgroundColor;
                     Text = string.Empty;
                     break;
             }
@@ -95,9 +86,7 @@ namespace SeatBattle.CSharp
         {
             base.OnPaint(e);
 
-            var borderColor = GetBorderColor();
-
-            using (var pen = new Pen(borderColor))
+            using (var pen = new Pen(DefaultBorderColor))
             {
                 pen.Alignment = PenAlignment.Inset;
                 pen.DashStyle = DashStyle.Solid;
@@ -108,17 +97,6 @@ namespace SeatBattle.CSharp
 
                 e.Graphics.DrawRectangle(pen, rect);
             }
-        }
-
-        private Color GetBorderColor()
-        {
-            if (State == BoardCellState.ShipDrag)
-                return DragOverBorderColor;
-
-            if (State == BoardCellState.ShipDragInvalid)
-                return DragOverInvalidBorderColor;
-
-            return DefaultBorderColor;
         }
 
         public int X { get; private set; }

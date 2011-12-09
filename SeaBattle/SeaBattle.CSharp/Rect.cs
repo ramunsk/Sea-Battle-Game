@@ -9,7 +9,7 @@ namespace SeatBattle.CSharp
     {
         private int _width;
         private int _height;
-        
+
 
         public Rect(int x, int y, int width, int height)
         {
@@ -66,14 +66,18 @@ namespace SeatBattle.CSharp
 
         public bool Contains(Rect rect)
         {
-            return X <= rect.X && Y <= rect.Y 
+            return X <= rect.X && Y <= rect.Y
                 && Right >= rect.Right && Bottom >= rect.Bottom;
         }
 
-        //http://silentmatt.com/rectangle-intersection/
         public bool IntersectsWith(Rect rect)
         {
-            return X < rect.Right && Right > rect.X && Y < rect.Height && Height > Y;
+            return !(
+                X > rect.Right
+                || Right < rect.X
+                || Y > rect.Bottom
+                || Bottom < rect.Y
+            );
         }
 
         public void MoveTo(int x, int y)

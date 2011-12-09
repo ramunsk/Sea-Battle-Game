@@ -45,11 +45,11 @@ namespace SeatBattle.CSharp
                 var label = new Label
                                 {
                                     AutoSize = false,
-                                    BackColor = BackColor,
+                                    BackColor = Color.Transparent,
                                     TextAlign = ContentAlignment.MiddleCenter,
                                     Text = i.ToString(),
                                     Location = new Point(CellSize.Width * i, 0),
-                                    Size = CellSize
+                                    Size = CellSize,
                                 };
                 _columnHeaders[i - 1] = label;
                 Controls.Add(label);
@@ -106,18 +106,28 @@ namespace SeatBattle.CSharp
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && !_shipOrientationModified)
             {
                 var rect = _draggedShip.GetShipRegion();
-                RedrawRegion(rect);
                 _draggedShip.Rotate();
+                RedrawRegion(rect);
                 _shipOrientationModified = true;
-                DrawShip(_draggedShip, BoardCellState.ShipDrag);
+
+                var cell = (BoardCell)sender;
+                var state = CanPlaceShip(_draggedShip, cell.X, cell.Y) ? BoardCellState.ShipDrag : BoardCellState.ShipDragInvalid;
+
+                DrawShip(_draggedShip, state);
+                _shipOrientationModified = true;
             }
             else if (Keyboard.IsKeyUp(Key.LeftCtrl) && _shipOrientationModified)
             {
                 var rect = _draggedShip.GetShipRegion();
-                RedrawRegion(rect);
                 _draggedShip.Rotate();
+                RedrawRegion(rect);
+                _shipOrientationModified = true;
+
+                var cell = (BoardCell)sender;
+                var state = CanPlaceShip(_draggedShip, cell.X, cell.Y) ? BoardCellState.ShipDrag : BoardCellState.ShipDragInvalid;
+
+                DrawShip(_draggedShip, state);
                 _shipOrientationModified = false;
-                DrawShip(_draggedShip, BoardCellState.ShipDrag);
             }
         }
 
@@ -132,7 +142,10 @@ namespace SeatBattle.CSharp
             var ship = GetShipAt(cell.X, cell.Y);
 
             if (ship == null)
+            {
+                Debug.WriteLine("No ship at ({0},{1})", cell.X, cell.Y);
                 return;
+            }
 
             _draggedShip = DraggableShip.From(ship);
             cell.DoDragDrop(ship, DragDropEffects.Copy | DragDropEffects.Move);
@@ -140,7 +153,6 @@ namespace SeatBattle.CSharp
 
         private void OnCellDragEnter(object sender, DragEventArgs e)
         {
-            Debug.WriteLine("OnCellDragEnter");
             if (e.Data.GetDataPresent(typeof(Ship)))
             {
                 var cell = (BoardCell)sender;
@@ -169,16 +181,21 @@ namespace SeatBattle.CSharp
 
         private void OnCellDragDrop(object sender, DragEventArgs e)
         {
-            Debug.WriteLine("OnCellDragDrop");
             var cell = (BoardCell)sender;
             if (e.Data.GetDataPresent(typeof(Ship)))
             {
                 if (!CanPlaceShip(_draggedShip, cell.X, cell.Y))
                     return;
+                
                 var ship = _draggedShip.Source;
+                _ships.Remove(ship);
+                
+                var rect = ship.GetShipRegion();
+                RedrawRegion(rect);
+                
                 ship.Orientation = _draggedShip.Orientation;
 
-                MoveShip(ship, cell.X, cell.Y);
+                AddShip(ship, cell.X, cell.Y);
                 _draggedShip = null;
 
             }
@@ -197,8 +214,8 @@ namespace SeatBattle.CSharp
             if (!CanPlaceShip(ship, x, y))
                 throw new InvalidOperationException("Cannot place ship at a given location");
 
-            ship.X = x;
-            ship.Y = y;
+            ship.MoveTo(x, y);
+
             _ships.Add(ship);
             DrawShip(ship, BoardCellState.Ship);
         }
@@ -216,6 +233,9 @@ namespace SeatBattle.CSharp
 
             foreach (var s in _ships)
             {
+                if (ship is DraggableShip && ReferenceEquals(s, ((DraggableShip)ship).Source))
+                    continue;
+
                 if (s.GetShipRegion().IntersectsWith(shipRegion))
                     return false;
             }
@@ -245,12 +265,12 @@ namespace SeatBattle.CSharp
 
         private void DrawShip(Ship ship, BoardCellState state)
         {
-            SuspendLayout();
+            //SuspendLayout();
             var rect = ship.GetShipRegion();
 
-            for (var dx = rect.X; dx <= rect.Width; dx++)
+            for (var dx = rect.X; dx <= rect.Right; dx++)
             {
-                for (var dy = rect.Y; dy <= rect.Height; dy++)
+                for (var dy = rect.Y; dy <= rect.Bottom; dy++)
                 {
                     if (dx < BoardWidth && dy < BoardHeight)
                     {
@@ -260,19 +280,27 @@ namespace SeatBattle.CSharp
                     }
                 }
             }
-            ResumeLayout();
+            //ResumeLayout();
         }
 
-        private void MoveShip(Ship ship, int x, int y)
-        {
-            var rect = ship.GetShipRegion();
-            _ships.Remove(ship);
-            RedrawRegion(rect);
+        //private void MoveShip(Ship ship, int x, int y)
+        //{
+        //    Rect rect;
+        //    if (ship is DraggableShip)
+        //    {
+        //        rect = ((DraggableShip)ship).Source.GetShipRegion();
+        //    }
+        //    else
+        //    {
+        //        rect = ship.GetShipRegion();
+        //    }
 
+            
+        //    _ships.Remove(ship);
+        //    RedrawRegion(rect);
 
-            //ship.Location = new Point(x, y);
-            AddShip(ship, x, y);
-        }
+        //    AddShip(ship, x, y);
+        //}
 
         public void ClearBoard()
         {
@@ -291,6 +319,7 @@ namespace SeatBattle.CSharp
 
         public void AddRandomShips()
         {
+            SuspendLayout();
             var rnd = new Random(DateTime.Now.Millisecond);
             var ships = new List<Ship>
                         {
@@ -306,9 +335,6 @@ namespace SeatBattle.CSharp
                             new Ship(1){Orientation = (ShipOrientation)rnd.Next(2)}
                         };
 
-            var shipsPlaced = 0;
-
-
             foreach (var ship in ships)
             {
                 var shipPlaced = false;
@@ -318,15 +344,13 @@ namespace SeatBattle.CSharp
                     var x = rnd.Next(10);
                     var y = rnd.Next(10);
 
-                    Debug.WriteLine("Placing ship (length={0}, orientation={3}) at x={1}, y={2}", ship.Length, x, y, ship.Orientation);
+                    //Debug.WriteLine("Placing ship (length={0}, orientation={3}) at x={1}, y={2}", ship.Length, x, y, ship.Orientation);
 
                     if (CanPlaceShip(ship, x, y))
                     {
                         AddShip(ship, x, y);
                         shipPlaced = true;
-                        shipsPlaced++;
-                        Refresh();
-                        Debug.WriteLine("PLACED AT WHILE");
+                        //Debug.WriteLine("PLACED AT WHILE");
                         continue;
                     }
                     retries++;
@@ -343,17 +367,15 @@ namespace SeatBattle.CSharp
                         if (CanPlaceShip(ship, i, j))
                         {
                             AddShip(ship, i, j);
-                            shipsPlaced++;
                             shipPlaced = true;
-                            Refresh();
-                            Debug.WriteLine("PLACED AT FOR");
+                            //Debug.WriteLine("PLACED AT FOR");
                             break;
                             
                         }
                     }
                 }
             }
-
+            ResumeLayout();
         }
     }
 }
