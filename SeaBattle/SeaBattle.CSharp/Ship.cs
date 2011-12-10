@@ -76,6 +76,8 @@ namespace SeatBattle.CSharp
 
             return draggableShip;
         }
+
+        public bool IsOrientationModified { get; set; }
     }
 
 
@@ -83,24 +85,6 @@ namespace SeatBattle.CSharp
     {
         Horizontal,
         Vertical
-    }
-
-    public class RandomPoint
-    {
-        public int X;
-        public int Y;
-
-        public RandomPoint()
-        {
-            var r = new Random(DateTime.Now.Millisecond);
-            X = r.Next(1, 10);
-            Y = r.Next(1, 10);
-        }
-
-        //public Point ToPoint()
-        //{
-        //    return new Point(X, Y);
-        //}
     }
 
     public class Player

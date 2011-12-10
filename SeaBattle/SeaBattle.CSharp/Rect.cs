@@ -70,6 +70,11 @@ namespace SeatBattle.CSharp
                 && Right >= rect.Right && Bottom >= rect.Bottom;
         }
 
+        public bool Contains(int x, int y)
+        {
+            return x >= X && x <= Right && y >= Y && Y <= Bottom;
+        }
+
         public bool IntersectsWith(Rect rect)
         {
             return !(
