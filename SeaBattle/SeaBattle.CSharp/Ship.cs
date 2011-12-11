@@ -7,12 +7,23 @@ namespace SeatBattle.CSharp
     [DebuggerDisplay("({Location.X},{Location.Y}) {Orientation} x{Length}")]
     public class Ship
     {
-        public int Length { get; set; }
-        public ShipOrientation Orientation { get; set; }
-
         public Ship(int length)
         {
             Length = length;
+        }
+
+        public int Length { get; set; }
+        public ShipOrientation Orientation { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int HitCount { get; set; }
+
+        public bool IsDrowned
+        {
+            get
+            {
+                return HitCount == Length;
+            }
         }
 
         public bool IsLocatedAt(int x, int y)
@@ -21,7 +32,6 @@ namespace SeatBattle.CSharp
 
             return (x >= rect.X && x <= rect.Right && y >= rect.Y && y <= rect.Bottom);
         }
-
 
         public Rect GetShipRegion()
         {
@@ -37,7 +47,6 @@ namespace SeatBattle.CSharp
             return (rect.IntersectsWith(r));
         }
 
-
         public void MoveTo(int x, int y)
         {
             X = x;
@@ -49,8 +58,7 @@ namespace SeatBattle.CSharp
             Orientation = Orientation == ShipOrientation.Horizontal ? ShipOrientation.Vertical : ShipOrientation.Horizontal;
         }
 
-        public int X { get; set; }
-        public int Y { get; set; }
+
 
 
     }
@@ -85,33 +93,5 @@ namespace SeatBattle.CSharp
     {
         Horizontal,
         Vertical
-    }
-
-    public class Player
-    {
-        public string Name { get; set; }
-        public List<Ship> Ships { get; set; }
-
-
-        public Player(string name)
-        {
-            Name = name;
-            Ships = new List<Ship>
-                    {
-                        new Ship(4),
-                        new Ship(3), new Ship(3),
-                        new Ship(2), new Ship(2), new Ship(2),
-                        new Ship(1), new Ship(1), new Ship(1), new Ship(1)
-                    };
-        }
-
-
-        //public void RandomizeShips()
-        //{
-        //    foreach (var ship in Ships)
-        //    {
-        //        ship.Location = new RandomPoint().ToPoint();
-        //    }
-        //}
     }
 }

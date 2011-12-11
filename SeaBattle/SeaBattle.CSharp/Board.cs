@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -16,7 +15,7 @@ namespace SeatBattle.CSharp
         private readonly BoardCell[,] _cells;
         private readonly List<Ship> _ships;
         private DraggableShip _draggedShip;
-        private Random _rnd;
+        private readonly Random _rnd;
 
 
         public Board()
@@ -24,6 +23,7 @@ namespace SeatBattle.CSharp
             _cells = new BoardCell[10, 10];
             _ships = new List<Ship>();
             _rnd = new Random(DateTime.Now.Millisecond);
+            Mode = BoardMode.Design;
 
             CreateBoard();
         }
@@ -97,10 +97,47 @@ namespace SeatBattle.CSharp
                 cell.DragLeave += OnCellDragLeave;
                 cell.DragDrop += OnCellDragDrop;
                 cell.QueryContinueDrag += OnCellQueryContinueDrag;
+                cell.Click += new EventHandler(cell_Click);
                 Controls.Add(cell);
             }
 
             ResumeLayout();
+        }
+
+        void cell_Click(object sender, EventArgs e)
+        {
+            var cell = (BoardCell)sender;
+            OpenentShotAt(cell.X, cell.Y);
+        }
+
+        /// <summary>
+        ///     Get a ship a a given location
+        /// </summary>
+        /// <param name="x">X coordinate to check ship at</param>
+        /// <param name="y">y coordinate to check ship at</param>
+        /// <returns><see cref="Ship"/></returns>
+        private Ship GetShipAt(int x, int y)
+        {
+            return _ships.FirstOrDefault(ship => ship.IsLocatedAt(x, y));
+        }
+
+        /// <summary>
+        ///     Handles <see cref="BoardCell"/>'s MouseDown event and initiates ship drag'n'drop    
+        /// </summary>
+        private void OnCellMouseDown(object sender, MouseEventArgs e)
+        {
+            if (Mode == BoardMode.Game)
+                return;
+
+            var cell = (BoardCell)sender;
+            var ship = GetShipAt(cell.X, cell.Y);
+
+            if (ship == null)
+            {
+                return;
+            }
+            _draggedShip = DraggableShip.From(ship);
+            cell.DoDragDrop(ship, DragDropEffects.Copy | DragDropEffects.Move);
         }
 
         /// <summary>
@@ -123,33 +160,6 @@ namespace SeatBattle.CSharp
 
             var state = CanPlaceShip(_draggedShip, _draggedShip.X, _draggedShip.Y) ? BoardCellState.ShipDrag : BoardCellState.ShipDragInvalid;
             DrawShip(_draggedShip, state);
-        }
-
-        /// <summary>
-        ///     Get a ship a a given location
-        /// </summary>
-        /// <param name="x">X coordinate to check ship at</param>
-        /// <param name="y">y coordinate to check ship at</param>
-        /// <returns><see cref="Ship"/></returns>
-        private Ship GetShipAt(int x, int y)
-        {
-            return _ships.FirstOrDefault(ship => ship.IsLocatedAt(x, y));
-        }
-
-        /// <summary>
-        ///     Handles <see cref="BoardCell"/>'s MouseDown event and initiates ship drag'n'drop    
-        /// </summary>
-        private void OnCellMouseDown(object sender, MouseEventArgs e)
-        {
-            var cell = (BoardCell)sender;
-            var ship = GetShipAt(cell.X, cell.Y);
-
-            if (ship == null)
-            {
-                return;
-            }
-            _draggedShip = DraggableShip.From(ship);
-            cell.DoDragDrop(ship, DragDropEffects.Copy | DragDropEffects.Move);
         }
 
         /// <summary>
@@ -322,7 +332,9 @@ namespace SeatBattle.CSharp
             ResumeLayout();
         }
 
-
+        /// <summary>
+        ///     Adds random ships on a board
+        /// </summary>
         public void AddRandomShips()
         {
             SuspendLayout();
@@ -349,6 +361,10 @@ namespace SeatBattle.CSharp
             ResumeLayout();
         }
 
+        /// <summary>
+        ///     Returns a list of ships with random locations. 
+        ///     This is usualy used to begin new game     
+        /// </summary>
         private IList<Ship> GetNewShips()
         {
             var ships = new List<Ship>
@@ -366,6 +382,25 @@ namespace SeatBattle.CSharp
                         };
 
             return ships;
+        }
+
+        public BoardMode Mode { get; set; }
+
+
+        public ShotResult OpenentShotAt(int x, int y)
+        {
+            var ship = GetShipAt(x, y);
+
+            if (ship == null)
+            {
+                _cells[x, y].State = BoardCellState.MissedShot;
+                return ShotResult.Missed;
+            }
+            _cells[x, y].State = BoardCellState.ShotShip;
+
+            ship.HitCount++;
+
+            return ship.IsDrowned ? ShotResult.ShipDrowned : ShotResult.ShipHit;
         }
     }
 }

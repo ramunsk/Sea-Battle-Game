@@ -28,6 +28,7 @@ namespace SeatBattle.CSharp
         {
             _humanBoard.ClearBoard();
             _humanBoard.AddRandomShips();
+            _humanBoard.Mode = BoardMode.Game;
 
 
             //var ship = new Ship(4) {Orientation = ShipOrientation.Horizontal};
