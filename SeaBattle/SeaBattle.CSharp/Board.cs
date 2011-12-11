@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using System.Windows.Input;
-using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace SeatBattle.CSharp
 {
@@ -15,132 +14,135 @@ namespace SeatBattle.CSharp
         private static readonly Rect BoardRegion = new Rect(0, 0, 10, 10);
 
         private readonly BoardCell[,] _cells;
-        private readonly Label[] _rowHeaders;
-        private readonly Label[] _columnHeaders;
         private readonly List<Ship> _ships;
         private DraggableShip _draggedShip;
+        private Random _rnd;
 
 
         public Board()
         {
             _cells = new BoardCell[10, 10];
-            _rowHeaders = new Label[10];
-            _columnHeaders = new Label[10];
             _ships = new List<Ship>();
+            _rnd = new Random(DateTime.Now.Millisecond);
 
-            CreateRowHeaders();
-            CreateColumnHeaders();
             CreateBoard();
-
-            base.MinimumSize = new Size(CellSize * 11, CellSize * 11);
-            base.MaximumSize = new Size(CellSize * 11, CellSize * 11);
         }
 
-        
-        private void CreateColumnHeaders()
+        /// <summary>
+        ///     Creates board header cell ar a given position
+        /// </summary>
+        /// <param name="x">X coordnate of cell</param>
+        /// <param name="y">Y coordinate of cell</param>
+        /// <param name="text">Text of cell</param>
+        /// <returns></returns>
+        private static Label CreateHeaderCell(int x, int y, string text)
         {
-            for (var i = 1; i < 11; i++)
-            {
-                var label = new Label
-                                {
-                                    AutoSize = false,
-                                    BackColor = Color.Transparent,
-                                    TextAlign = ContentAlignment.MiddleCenter,
-                                    Text = i.ToString(),
-                                    Location = new Point(CellSize * i, 0),
-                                    Size = new Size(CellSize, CellSize)
-                                };
-                _columnHeaders[i - 1] = label;
-                Controls.Add(label);
+            return new Label
+                       {
+                           AutoSize = false,
+                           BackColor = Color.Transparent,
+                           TextAlign = ContentAlignment.MiddleCenter,
+                           Text = text,
+                           Location = new Point(x, y),
+                           Width = CellSize,
+                           Height = CellSize
+                       };
+        }
 
+        /// <summary>
+        ///     Creates board headers
+        /// </summary>
+        private void CreateHeaders()
+        {
+            for (var i = 0; i < BoardRegion.Width; i++)
+            {
+                var offset = CellSize * i + CellSize;
+                var columnHeader = CreateHeaderCell(offset, 0, (i + 1).ToString());
+                var rowHeader = CreateHeaderCell(0, offset, (i + 1).ToString());
+
+                Controls.Add(columnHeader);
+                Controls.Add(rowHeader);
             }
 
         }
 
-        private void CreateRowHeaders()
-        {
-            for (var i = 1; i < 11; i++)
-            {
-                var label = new Label
-                                {
-                                    AutoSize = false,
-                                    BackColor = BackColor,
-                                    TextAlign = ContentAlignment.MiddleCenter,
-                                    Text = i.ToString(),
-                                    Location = new Point(0, CellSize * i),
-                                    Size = new Size(CellSize, CellSize)
-                                };
-                _rowHeaders[i - 1] = label;
-                Controls.Add(label);
-            }
-
-        }
-
+        /// <summary>
+        ///     Creates a board layout
+        /// </summary>
         private void CreateBoard()
         {
-            for (var x = 0; x < 10; x++)
+            SuspendLayout();
+
+            var boardSize = new Size(CellSize * BoardRegion.Width + CellSize, CellSize * BoardRegion.Height + CellSize);
+            base.MinimumSize = boardSize;
+            base.MaximumSize = boardSize;
+
+            CreateHeaders();
+
+            var points = BoardRegion.GetPoints();
+
+            foreach(var point in points)
             {
-                for (var y = 0; y < 10; y++)
-                {
-                    var cell = new BoardCell(x, y)
-                                   {
-                                       Size = new Size(CellSize, CellSize),
-                                       Location = new Point(CellSize * (x + 1), CellSize * (y + 1)),
-                                       State = BoardCellState.Normal,
-                                       //IsValidForNewShip = true
-                                   };
-                    _cells[x, y] = cell;
-                    cell.MouseDown += OnCellMouseDown;
-                    cell.DragEnter += OnCellDragEnter;
-                    cell.DragLeave += OnCellDragLeave;
-                    cell.DragDrop += OnCellDragDrop;
-                    cell.QueryContinueDrag += OnCellQueryContinueDrag;
-                    Controls.Add(cell);
-                }
+                var cell = new BoardCell(point.X, point.Y)
+                               {
+                                   Top = point.X * CellSize + CellSize,
+                                   Left = point.Y * CellSize + CellSize,
+                                   Width = CellSize,
+                                   Height = CellSize,
+                                   State = BoardCellState.Normal
+                               };
+                _cells[point.X, point.Y] = cell;
+                cell.MouseDown += OnCellMouseDown;
+                cell.DragEnter += OnCellDragEnter;
+                cell.DragLeave += OnCellDragLeave;
+                cell.DragDrop += OnCellDragDrop;
+                cell.QueryContinueDrag += OnCellQueryContinueDrag;
+                Controls.Add(cell);
             }
+
+            ResumeLayout();
         }
 
+        /// <summary>
+        ///     Gives feedback for ship rotation while dragging it
+        /// </summary>
         private void OnCellQueryContinueDrag(object sender, QueryContinueDragEventArgs e)
         {
-            
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) && !_draggedShip.IsOrientationModified)
-            {
-                var rect = _draggedShip.GetShipRegion();
-                RedrawRegion(rect);
+            // check Ctrl key state
+            var shouldRotate = ((e.KeyState & 8) == 8);
+            var isRotated = _draggedShip.IsOrientationModified;
 
-                _draggedShip.Rotate();
-                _draggedShip.IsOrientationModified = true;
+            if ((shouldRotate && isRotated) || (!shouldRotate && !isRotated))
+                return;
 
-                var state = CanPlaceShip(_draggedShip, _draggedShip.X, _draggedShip.Y) ? BoardCellState.ShipDrag : BoardCellState.ShipDragInvalid;
+            var rect = _draggedShip.GetShipRegion();
+            RedrawRegion(rect);
 
+            _draggedShip.Rotate();
+            _draggedShip.IsOrientationModified = !isRotated;
 
-                DrawShip(_draggedShip, state);
-                _draggedShip.IsOrientationModified = true;
-            }
-            else if (Keyboard.IsKeyUp(Key.LeftCtrl) && _draggedShip.IsOrientationModified)
-            {
-                var rect = _draggedShip.GetShipRegion();
-                _draggedShip.Rotate();
-                RedrawRegion(rect);
-                _draggedShip.IsOrientationModified = true;
-
-                var state = CanPlaceShip(_draggedShip, _draggedShip.X, _draggedShip.Y) ? BoardCellState.ShipDrag : BoardCellState.ShipDragInvalid;
-
-                DrawShip(_draggedShip, state);
-                _draggedShip.IsOrientationModified = false;
-            }
+            var state = CanPlaceShip(_draggedShip, _draggedShip.X, _draggedShip.Y) ? BoardCellState.ShipDrag : BoardCellState.ShipDragInvalid;
+            DrawShip(_draggedShip, state);
         }
 
+        /// <summary>
+        ///     Get a ship a a given location
+        /// </summary>
+        /// <param name="x">X coordinate to check ship at</param>
+        /// <param name="y">y coordinate to check ship at</param>
+        /// <returns><see cref="Ship"/></returns>
         private Ship GetShipAt(int x, int y)
         {
             return _ships.FirstOrDefault(ship => ship.IsLocatedAt(x, y));
         }
 
+        /// <summary>
+        ///     Handles <see cref="BoardCell"/>'s MouseDown event and initiates ship drag'n'drop    
+        /// </summary>
         private void OnCellMouseDown(object sender, MouseEventArgs e)
         {
             var cell = (BoardCell)sender;
             var ship = GetShipAt(cell.X, cell.Y);
-
 
             if (ship == null)
             {
@@ -150,6 +152,9 @@ namespace SeatBattle.CSharp
             cell.DoDragDrop(ship, DragDropEffects.Copy | DragDropEffects.Move);
         }
 
+        /// <summary>
+        ///     Handles <see cref="BoardCell"/>'s DragEnter event
+        /// </summary>
         private void OnCellDragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(Ship)))
@@ -170,6 +175,9 @@ namespace SeatBattle.CSharp
             }
         }
 
+        /// <summary>
+        ///     Handles <see cref="BoardCell"/>'s DragLeave event
+        /// </summary>
         private void OnCellDragLeave(object sender, EventArgs e)
         {
             var rect = _draggedShip.GetShipRegion();
@@ -177,6 +185,9 @@ namespace SeatBattle.CSharp
 
         }
 
+        /// <summary>
+        ///     Handles <see cref="BoardCell"/>'s DragDrop event
+        /// </summary>
         private void OnCellDragDrop(object sender, DragEventArgs e)
         {
             var cell = (BoardCell)sender;
@@ -203,6 +214,12 @@ namespace SeatBattle.CSharp
             }
         }
 
+        /// <summary>
+        ///     Adds a ship on a board
+        /// </summary>
+        /// <param name="ship">Ship to add</param>
+        /// <param name="x">X coordinate of where to add ship</param>
+        /// <param name="y">Y coordinate of where to add ship</param>
         public void AddShip(Ship ship, int x, int y)
         {
             ship.MoveTo(x, y);
@@ -211,6 +228,12 @@ namespace SeatBattle.CSharp
             DrawShip(ship, BoardCellState.Ship);
         }
 
+        /// <summary>
+        ///     Returns true if given shio van be placed at a given location
+        /// </summary>
+        /// <param name="ship">Ship to check</param>
+        /// <param name="x">X coordinate to check</param>
+        /// <param name="y">Y coordinate to check</param>
         private bool CanPlaceShip(Ship ship, int x, int y)
         {
             var shipRegion = ship.GetShipRegion();
@@ -299,60 +322,50 @@ namespace SeatBattle.CSharp
             ResumeLayout();
         }
 
+
         public void AddRandomShips()
         {
             SuspendLayout();
-            var rnd = new Random(DateTime.Now.Millisecond);
-            var ships = new List<Ship>
-                        {
-                            new Ship(4){Orientation = (ShipOrientation)rnd.Next(2)},
-                            new Ship(3){Orientation = (ShipOrientation)rnd.Next(2)},
-                            new Ship(3){Orientation = (ShipOrientation)rnd.Next(2)},
-                            new Ship(2){Orientation = (ShipOrientation)rnd.Next(2)},
-                            new Ship(2){Orientation = (ShipOrientation)rnd.Next(2)},
-                            new Ship(2){Orientation = (ShipOrientation)rnd.Next(2)},
-                            new Ship(1){Orientation = (ShipOrientation)rnd.Next(2)},
-                            new Ship(1){Orientation = (ShipOrientation)rnd.Next(2)},
-                            new Ship(1){Orientation = (ShipOrientation)rnd.Next(2)},
-                            new Ship(1){Orientation = (ShipOrientation)rnd.Next(2)}
-                        };
+
+            var ships = GetNewShips();
 
             foreach (var ship in ships)
             {
-                var shipPlaced = false;
-                var retries = 0;
-                while (!shipPlaced && retries < 10)
+                var shipAdded = false;
+
+                while (!shipAdded)
                 {
-                    var x = rnd.Next(10);
-                    var y = rnd.Next(10);
+                    var x = _rnd.Next(10);
+                    var y = _rnd.Next(10);
 
-
-                    if (CanPlaceShip(ship, x, y))
-                    {
-                        AddShip(ship, x, y);
-                        shipPlaced = true;
+                    if (!CanPlaceShip(ship, x, y))
                         continue;
-                    }
-                    retries++;
-                }
-                for (int i = 0; i < BoardRegion.Width; i++)
-                {
-                    if (shipPlaced)
-                        break;
-
-                    for (int j = 0; j < BoardRegion.Height; j++)
-                    {
-                        if (CanPlaceShip(ship, i, j))
-                        {
-                            AddShip(ship, i, j);
-                            shipPlaced = true;
-                            break;
-
-                        }
-                    }
+                    
+                    AddShip(ship, x, y);
+                    shipAdded = true;
                 }
             }
+
             ResumeLayout();
+        }
+
+        private IList<Ship> GetNewShips()
+        {
+            var ships = new List<Ship>
+                        {
+                            new Ship(4){Orientation = (ShipOrientation)_rnd.Next(2)},
+                            new Ship(3){Orientation = (ShipOrientation)_rnd.Next(2)},
+                            new Ship(3){Orientation = (ShipOrientation)_rnd.Next(2)},
+                            new Ship(2){Orientation = (ShipOrientation)_rnd.Next(2)},
+                            new Ship(2){Orientation = (ShipOrientation)_rnd.Next(2)},
+                            new Ship(2){Orientation = (ShipOrientation)_rnd.Next(2)},
+                            new Ship(1){Orientation = (ShipOrientation)_rnd.Next(2)},
+                            new Ship(1){Orientation = (ShipOrientation)_rnd.Next(2)},
+                            new Ship(1){Orientation = (ShipOrientation)_rnd.Next(2)},
+                            new Ship(1){Orientation = (ShipOrientation)_rnd.Next(2)}
+                        };
+
+            return ships;
         }
     }
 }
