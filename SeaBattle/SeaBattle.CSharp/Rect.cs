@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 
@@ -70,9 +71,9 @@ namespace SeatBattle.CSharp
                 && Right >= rect.Right && Bottom >= rect.Bottom;
         }
 
-        public bool Contains(int x, int y)
+        public bool Contains(Point point)
         {
-            return x >= X && x <= Right && y >= Y && Y <= Bottom;
+            return point.X >= X && point.X <= Right && point.Y >= Y && point.Y <= Bottom;
         }
 
         public bool IntersectsWith(Rect rect)
@@ -89,6 +90,21 @@ namespace SeatBattle.CSharp
         {
             X = x;
             Y = y;
+        }
+
+        public IList<Point> GetPoints()
+        {
+            var points = new List<Point>();
+
+            for (var x = X; x <= Right; x++)
+            {
+                for (var y = Y; y <= Bottom; y++)
+                {
+                    points.Add(new Point(x, y));
+                }
+            }
+
+            return points;
         }
     }
 }

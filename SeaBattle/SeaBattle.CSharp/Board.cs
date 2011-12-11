@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -11,8 +10,8 @@ namespace SeatBattle.CSharp
 {
     public class Board : Control
     {
-        private const int BoardHeight = 10;
-        private const int BoardWidth = 10;
+        private const int CellSize = 25;
+
         private static readonly Rect BoardRegion = new Rect(0, 0, 10, 10);
 
         private readonly BoardCell[,] _cells;
@@ -33,10 +32,11 @@ namespace SeatBattle.CSharp
             CreateColumnHeaders();
             CreateBoard();
 
-            base.MinimumSize = new Size(CellSize.Width * 11, CellSize.Height * 11);
-            base.MaximumSize = new Size(CellSize.Width * 11, CellSize.Height * 11);
+            base.MinimumSize = new Size(CellSize * 11, CellSize * 11);
+            base.MaximumSize = new Size(CellSize * 11, CellSize * 11);
         }
 
+        
         private void CreateColumnHeaders()
         {
             for (var i = 1; i < 11; i++)
@@ -47,8 +47,8 @@ namespace SeatBattle.CSharp
                                     BackColor = Color.Transparent,
                                     TextAlign = ContentAlignment.MiddleCenter,
                                     Text = i.ToString(),
-                                    Location = new Point(CellSize.Width * i, 0),
-                                    Size = CellSize,
+                                    Location = new Point(CellSize * i, 0),
+                                    Size = new Size(CellSize, CellSize)
                                 };
                 _columnHeaders[i - 1] = label;
                 Controls.Add(label);
@@ -67,8 +67,8 @@ namespace SeatBattle.CSharp
                                     BackColor = BackColor,
                                     TextAlign = ContentAlignment.MiddleCenter,
                                     Text = i.ToString(),
-                                    Location = new Point(0, CellSize.Height * i),
-                                    Size = CellSize
+                                    Location = new Point(0, CellSize * i),
+                                    Size = new Size(CellSize, CellSize)
                                 };
                 _rowHeaders[i - 1] = label;
                 Controls.Add(label);
@@ -84,8 +84,8 @@ namespace SeatBattle.CSharp
                 {
                     var cell = new BoardCell(x, y)
                                    {
-                                       Size = CellSize,
-                                       Location = new Point(CellSize.Width * (x + 1), CellSize.Height * (y + 1)),
+                                       Size = new Size(CellSize, CellSize),
+                                       Location = new Point(CellSize * (x + 1), CellSize * (y + 1)),
                                        State = BoardCellState.Normal,
                                        //IsValidForNewShip = true
                                    };
@@ -102,12 +102,12 @@ namespace SeatBattle.CSharp
 
         private void OnCellQueryContinueDrag(object sender, QueryContinueDragEventArgs e)
         {
-
+            
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && !_draggedShip.IsOrientationModified)
             {
                 var rect = _draggedShip.GetShipRegion();
                 RedrawRegion(rect);
-                
+
                 _draggedShip.Rotate();
                 _draggedShip.IsOrientationModified = true;
 
@@ -141,11 +141,11 @@ namespace SeatBattle.CSharp
             var cell = (BoardCell)sender;
             var ship = GetShipAt(cell.X, cell.Y);
 
+
             if (ship == null)
             {
                 return;
             }
-
             _draggedShip = DraggableShip.From(ship);
             cell.DoDragDrop(ship, DragDropEffects.Copy | DragDropEffects.Move);
         }
@@ -184,13 +184,13 @@ namespace SeatBattle.CSharp
             {
                 if (!CanPlaceShip(_draggedShip, cell.X, cell.Y))
                     return;
-                
+
                 var ship = _draggedShip.Source;
                 _ships.Remove(ship);
-                
+
                 var rect = ship.GetShipRegion();
                 RedrawRegion(rect);
-                
+
                 ship.Orientation = _draggedShip.Orientation;
 
                 AddShip(ship, cell.X, cell.Y);
@@ -201,16 +201,10 @@ namespace SeatBattle.CSharp
             {
                 e.Effect = DragDropEffects.None;
             }
-            cell.Invalidate();
         }
-
-        public Size CellSize { get { return new Size(25, 25); } }
 
         public void AddShip(Ship ship, int x, int y)
         {
-            if (!CanPlaceShip(ship, x, y))
-                throw new InvalidOperationException("Cannot place ship at a given location");
-
             ship.MoveTo(x, y);
 
             _ships.Add(ship);
@@ -245,58 +239,63 @@ namespace SeatBattle.CSharp
             return true;
         }
 
+        /// <summary>
+        ///     Redraws a given region on a board
+        /// </summary>
+        /// <param name="region">A region to redraw</param>
         private void RedrawRegion(Rect region)
         {
             SuspendLayout();
-            for (var x = region.X; x <= region.Right; x++)
-            {
-                for (var y = region.Y; y <= region.Bottom; y++)
-                {
-                    if (x >= BoardWidth || y >= BoardHeight)
-                    {
-                        continue;
-                    }
 
-                    var ship = GetShipAt(x, y);
-                    _cells[x, y].State = ship == null ? BoardCellState.Normal : BoardCellState.Ship;
-                    _cells[x, y].Invalidate();
+            var points = region.GetPoints();
+            foreach (var point in points)
+            {
+                if (!BoardRegion.Contains(point))
+                {
+                    continue;
                 }
+
+                var ship = GetShipAt(point.X, point.Y);
+                _cells[point.X, point.Y].State = ship == null ? BoardCellState.Normal : BoardCellState.Ship;
             }
+
             ResumeLayout();
         }
 
+        /// <summary>
+        ///     Draws a ship on a board
+        /// </summary>
+        /// <param name="ship">Ship to draw</param>
+        /// <param name="state">Ship state to draw</param>
         private void DrawShip(Ship ship, BoardCellState state)
         {
-            var rect = ship.GetShipRegion();
 
-            for (var dx = rect.X; dx <= rect.Right; dx++)
+            var points = ship.GetShipRegion().GetPoints();
+
+            foreach (var point in points)
             {
-                for (var dy = rect.Y; dy <= rect.Bottom; dy++)
+                if (BoardRegion.Contains(point))
                 {
-                    if (dx < BoardWidth && dy < BoardHeight)
-                    {
-                        var cell = _cells[dx, dy];
-                        cell.State = state;
-                        cell.Invalidate();
-                    }
+                    _cells[point.X, point.Y].State = state;
                 }
             }
         }
 
-       
-
+        /// <summary>
+        ///     Removes all ships from board
+        /// </summary>
         public void ClearBoard()
         {
             SuspendLayout();
+
             _ships.Clear();
-            for (int i = 0; i < BoardWidth; i++)
+
+            var points = BoardRegion.GetPoints();
+            foreach (var point in points)
             {
-                for (int j = 0; j < BoardHeight; j++)
-                {
-                    _cells[i, j].State = BoardCellState.Normal;
-                    _cells[i, j].IsOccupied = false;
-                }
+                _cells[point.X, point.Y].State = BoardCellState.Normal;
             }
+
             ResumeLayout();
         }
 
@@ -336,21 +335,19 @@ namespace SeatBattle.CSharp
                     }
                     retries++;
                 }
-                for (int i = 0; i < BoardWidth; i++)
+                for (int i = 0; i < BoardRegion.Width; i++)
                 {
                     if (shipPlaced)
                         break;
 
-                    for (int j = 0; j < BoardHeight; j++)
+                    for (int j = 0; j < BoardRegion.Height; j++)
                     {
-                        if (shipPlaced)
-                            break;
                         if (CanPlaceShip(ship, i, j))
                         {
                             AddShip(ship, i, j);
                             shipPlaced = true;
                             break;
-                            
+
                         }
                     }
                 }
