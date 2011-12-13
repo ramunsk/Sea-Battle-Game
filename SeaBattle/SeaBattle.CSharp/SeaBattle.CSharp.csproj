@@ -76,6 +76,9 @@
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Rect.cs" />
+    <Compile Include="ScoreBoard.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Ship.cs" />
   </ItemGroup>
   <ItemGroup>

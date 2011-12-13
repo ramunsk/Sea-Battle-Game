@@ -97,17 +97,25 @@ namespace SeatBattle.CSharp
                 cell.DragLeave += OnCellDragLeave;
                 cell.DragDrop += OnCellDragDrop;
                 cell.QueryContinueDrag += OnCellQueryContinueDrag;
-                cell.Click += new EventHandler(cell_Click);
+                cell.Click += OnCellClick;
                 Controls.Add(cell);
             }
 
             ResumeLayout();
         }
 
-        void cell_Click(object sender, EventArgs e)
+        private void OnCellClick(object sender, EventArgs e)
         {
+            if (Mode != BoardMode.Game)
+                return;
+
+            var handler = OnClick;
+            if (handler == null)
+                return;
+
             var cell = (BoardCell)sender;
-            OpenentShotAt(cell.X, cell.Y);
+            var eventArgs = new BoardCellClickEventErgs(cell.X, cell.Y);
+            handler(this, eventArgs);
         }
 
         /// <summary>
@@ -402,5 +410,31 @@ namespace SeatBattle.CSharp
 
             return ship.IsDrowned ? ShotResult.ShipDrowned : ShotResult.ShipHit;
         }
+
+        public new event EventHandler<BoardCellClickEventErgs> OnClick;
+
+    }
+
+    public class BoardCellClickEventErgs : EventArgs
+    {
+        private readonly int _x;
+        private readonly int _y;
+
+        public BoardCellClickEventErgs(int x, int y)
+        {
+            _x = x;
+            _y = y;
+        }
+
+        public int Y
+        {
+            get { return _y; }
+        }
+
+        public int X
+        {
+            get { return _x; }
+        }
+
     }
 }

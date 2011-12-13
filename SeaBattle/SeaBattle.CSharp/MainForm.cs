@@ -6,14 +6,41 @@ namespace SeatBattle.CSharp
     public class MainForm : Form
     {
         private readonly Board _humanBoard;
+        private readonly Board _computerBoard;
+        private readonly GameController _controller;
 
         public MainForm()
         {
             SuspendLayout();
             
             CreateWindowlayout();
+
+
+
             _humanBoard = new Board();
             Controls.Add(_humanBoard);
+
+            _computerBoard = new Board();
+            Controls.Add(_computerBoard);
+            _computerBoard.Location = new Point(_humanBoard.Left + _humanBoard.Width, 0);
+
+
+            _controller = new GameController
+                              {
+                                  Player1 = new HumanPlayer("Human",_computerBoard),
+                                  Player2 = new AiPlayer("Computer"),
+                                  Player1Board = _humanBoard,
+                                  Player2Board = _computerBoard
+                              };
+
+            _controller.Player1Board.AddRandomShips();
+            _controller.Player2Board.AddRandomShips();
+
+            _controller.Player1Board.Mode = BoardMode.Game;
+            _controller.Player2Board.Mode = BoardMode.Game;
+
+
+            _controller.StartGame();
 
             ResumeLayout();
 
@@ -26,9 +53,9 @@ namespace SeatBattle.CSharp
 
         void OnDoubleClick(object sender, System.EventArgs e)
         {
-            _humanBoard.ClearBoard();
-            _humanBoard.AddRandomShips();
-            _humanBoard.Mode = BoardMode.Game;
+            //_humanBoard.ClearBoard();
+            //_humanBoard.AddRandomShips();
+            //_humanBoard.Mode = BoardMode.Game;
 
 
             //var ship = new Ship(4) {Orientation = ShipOrientation.Horizontal};
