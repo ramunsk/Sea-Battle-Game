@@ -6,6 +6,7 @@ using System.Windows.Forms;
 
 namespace SeatBattle.CSharp
 {
+    // TODO: Different color for drowned ship
     public class Board : Control
     {
         private const int CellSize = 25;
@@ -16,14 +17,18 @@ namespace SeatBattle.CSharp
         private readonly List<Ship> _ships;
         private DraggableShip _draggedShip;
         private readonly Random _rnd;
+        private readonly bool _drawShips;
 
+        public Board():this(true){}
 
-        public Board()
+        public Board(bool drawShips)
         {
+            _drawShips = drawShips;
             _cells = new BoardCell[10, 10];
             _ships = new List<Ship>();
             _rnd = new Random(DateTime.Now.Millisecond);
             Mode = BoardMode.Design;
+            Margin = Padding.Empty;
 
             CreateBoard();
         }
@@ -134,7 +139,7 @@ namespace SeatBattle.CSharp
         /// </summary>
         private void OnCellMouseDown(object sender, MouseEventArgs e)
         {
-            if (Mode == BoardMode.Game)
+            if (Mode == BoardMode.Game || !_drawShips)
                 return;
 
             var cell = (BoardCell)sender;
@@ -310,6 +315,19 @@ namespace SeatBattle.CSharp
         /// <param name="state">Ship state to draw</param>
         private void DrawShip(Ship ship, BoardCellState state)
         {
+            DrawShip(ship, state, false);
+        }
+
+        /// <summary>
+        ///     Draws a ship on a board
+        /// </summary>
+        /// <param name="ship">Ship to draw</param>
+        /// <param name="state">Ship state to draw</param>
+        /// <param name="force">True to force ship drawing</param>
+        private void DrawShip(Ship ship, BoardCellState state, bool force)
+        {
+            if (!_drawShips && !force)
+                return;
 
             var points = ship.GetShipRegion().GetPoints();
 
@@ -408,33 +426,13 @@ namespace SeatBattle.CSharp
 
             ship.HitCount++;
 
+            if (ship.IsDrowned)
+                DrawShip(ship, BoardCellState.ShowDrowned, true);
+
             return ship.IsDrowned ? ShotResult.ShipDrowned : ShotResult.ShipHit;
         }
 
         public new event EventHandler<BoardCellClickEventErgs> OnClick;
-
-    }
-
-    public class BoardCellClickEventErgs : EventArgs
-    {
-        private readonly int _x;
-        private readonly int _y;
-
-        public BoardCellClickEventErgs(int x, int y)
-        {
-            _x = x;
-            _y = y;
-        }
-
-        public int Y
-        {
-            get { return _y; }
-        }
-
-        public int X
-        {
-            get { return _x; }
-        }
 
     }
 }

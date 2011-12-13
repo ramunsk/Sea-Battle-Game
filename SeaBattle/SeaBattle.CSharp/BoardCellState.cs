@@ -7,6 +7,7 @@ namespace SeatBattle.CSharp
         Ship,
         ShotShip,
         ShipDrag,
-        ShipDragInvalid
+        ShipDragInvalid,
+        ShowDrowned
     }
 }

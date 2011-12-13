@@ -13,6 +13,7 @@ namespace SeatBattle.CSharp
         private static readonly Color DragOverBackgroundColor = Color.FromArgb(255,174,0);
         private static readonly Color DragOverInvalidBackgroundColor = Color.FromArgb(222,0,0);
         private static readonly Color ShipColor = Color.FromArgb(65,133,243);
+        private static readonly Color ShipDrownedColor = Color.FromArgb(222, 0, 0);
 
         private const char ShipHitChar = (char)0x72;
         private const char MissedHitChar = (char)0x3D;
@@ -76,6 +77,10 @@ namespace SeatBattle.CSharp
                 case BoardCellState.ShipDragInvalid:
                     BackColor = DragOverInvalidBackgroundColor;
                     Text = string.Empty;
+                    break;
+                case BoardCellState.ShowDrowned:
+                    BackColor = ShipDrownedColor;
+                    Text = ShipHitChar.ToString();
                     break;
             }
             Invalidate();

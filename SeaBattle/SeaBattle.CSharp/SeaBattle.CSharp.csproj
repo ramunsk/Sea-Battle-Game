@@ -65,14 +65,20 @@
     <Compile Include="BoardCell.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="BoardCellClickEventErgs.cs" />
     <Compile Include="BoardCellState.cs" />
     <Compile Include="BoardMode.cs" />
+    <Compile Include="ComputerPlayer.cs" />
+    <Compile Include="DraggableShip.cs" />
+    <Compile Include="GameController.cs" />
+    <Compile Include="HumanPlayer.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Board.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Pair.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Rect.cs" />
@@ -80,9 +86,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Ship.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
+    <Compile Include="ShipOrientation.cs" />
+    <Compile Include="ShootingEventArgs.cs" />
+    <Compile Include="ShotResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -105,6 +111,9 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
