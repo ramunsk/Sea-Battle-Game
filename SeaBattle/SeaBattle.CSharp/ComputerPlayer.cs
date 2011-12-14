@@ -39,7 +39,7 @@ namespace SeatBattle.CSharp
         public override void Shoot()
         {
             base.Shoot();
-            _timer.Interval = _rnd.Next(1000);
+            _timer.Interval = _rnd.Next(100, 1000);
             _timer.Start();
         }
 
@@ -59,6 +59,13 @@ namespace SeatBattle.CSharp
             }
 
         }
+
+        public override void Reset()
+        {
+            base.Reset();
+            _currentTarget.Clear();
+        }
+
 
         private void ShootRandom()
         {

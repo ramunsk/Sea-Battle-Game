@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
 namespace SeatBattle.CSharp
 {
-    // TODO: Different color for drowned ship
     public class Board : Control
     {
         private const int CellSize = 25;
@@ -42,16 +42,17 @@ namespace SeatBattle.CSharp
         /// <returns></returns>
         private static Label CreateHeaderCell(int x, int y, string text)
         {
-            return new Label
-                       {
-                           AutoSize = false,
-                           BackColor = Color.Transparent,
-                           TextAlign = ContentAlignment.MiddleCenter,
-                           Text = text,
-                           Location = new Point(x, y),
-                           Width = CellSize,
-                           Height = CellSize
-                       };
+            var cell = new Label
+                           {
+                               AutoSize = false,
+                               BackColor = Color.Transparent,
+                               TextAlign = ContentAlignment.MiddleCenter,
+                               Text = text,
+                               Location = new Point(x, y),
+                               Width = CellSize,
+                               Height = CellSize
+                           };
+            return cell;
         }
 
         /// <summary>
@@ -308,6 +309,24 @@ namespace SeatBattle.CSharp
             ResumeLayout();
         }
 
+
+        public void ShowShips()
+        {
+            foreach(var ship in _ships)
+            {
+                var shipPoints = ship.GetShipRegion().GetPoints();
+
+                foreach(var point in shipPoints)
+                {
+                    var cell = _cells[point.X, point.Y];
+                    if (cell.State != BoardCellState.Normal)
+                        continue;
+
+                    cell.State = BoardCellState.Ship;                        
+                }
+            }
+        }
+
         /// <summary>
         ///     Draws a ship on a board
         /// </summary>
@@ -364,6 +383,8 @@ namespace SeatBattle.CSharp
         public void AddRandomShips()
         {
             SuspendLayout();
+
+            ClearBoard();
 
             var ships = GetNewShips();
 
@@ -433,6 +454,13 @@ namespace SeatBattle.CSharp
         }
 
         public new event EventHandler<BoardCellClickEventErgs> OnClick;
+
+        protected override void OnParentChanged(EventArgs e)
+        {
+            base.OnParentChanged(e);
+            Font = Parent.Font;
+            Debug.WriteLine(Font.Name);
+        }
 
     }
 }

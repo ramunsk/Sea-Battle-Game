@@ -11,29 +11,31 @@ namespace SeatBattle.CSharp
         private readonly Player _player2;
         private readonly int _shipsPerGame;
         private readonly int _shotsPerGame;
-        private Label _player1Label;
-        private Label _player2Label;
-        private Label _scoreLabel;
-        private Label _player1Stats;
-        private Label _player2Stats;
+        private readonly Label _scoreLabel;
 
         private const string PlayerStatsTemplate = "Ships left: {0}, Shots left: {1}";
         private const string ScoreTemplate = "{0} : {1}";
 
-        private readonly Color _playerNameColor = Color.Black;
-        private readonly Color _activePlayerNameColor = Color.FromArgb(0,159,0);
+        private static readonly Color ActivePlayerColor = Color.FromArgb(255,174,0);
+        private static readonly Color InactivePlayerColor = Color.FromArgb(128, 128, 128);
+        private static readonly Color PlayerStatsColor = Color.FromArgb(128, 128, 128);
+        private static readonly Color WinnerColor = Color.FromArgb(32, 167, 8);
+        private static readonly Color LooserColor = Color.FromArgb(222, 0, 0);
 
-        private Pair<Label, Label> _playerNames;
-        private Pair<Label, Label> _playerStats;
+        private static readonly Color ScoreColor = Color.Black;
+
+        private readonly Pair<Label, Label> _playerNames;
+        private readonly Pair<Label, Label> _playerStats;
 
         private Point _score;
         private Point _shipsLeft;
         private Point _shotsLeft;
 
-      
+
 
         public ScoreBoard(Player player1, Player player2, int shipsPerGame, int shotsPerGame)
         {
+            SuspendLayout();
             _player1 = player1;
             _player2 = player2;
             _shipsPerGame = shipsPerGame;
@@ -45,13 +47,45 @@ namespace SeatBattle.CSharp
             _player1.Shot += OnPlayerMadeShot;
             _player2.Shot += OnPlayerMadeShot;
 
-            SuspendLayout();
+
+            var firstPlayerNameLabel = CreateLabel(_player1.Name, InactivePlayerColor);
+            var secondPlayerNameLabel = CreateLabel(_player2.Name, InactivePlayerColor);
+            _playerNames = new Pair<Label, Label>(firstPlayerNameLabel, secondPlayerNameLabel);
 
 
-            CreateLayout();
+            var firstPlayerStatsLabel = CreateLabel(string.Empty, PlayerStatsColor);
+            var secondPlayerStatsLabel = CreateLabel(string.Empty, PlayerStatsColor);
+            _playerStats = new Pair<Label, Label>(firstPlayerStatsLabel, secondPlayerStatsLabel);
+
+            _scoreLabel = CreateLabel("", ScoreColor);
+
+            RefreshScore();
+            InitPlayerStats();
 
             ResumeLayout();
-            
+
+        }
+
+
+        private void InitPlayerStats()
+        {
+            _shipsLeft = new Point(_shipsPerGame, _shipsPerGame);
+            _shotsLeft = new Point(_shotsPerGame, _shotsPerGame);
+            RefreshPlayerStats();
+        }
+
+        private static Label CreateLabel(string text, Color color)
+        {
+            return new Label
+                       {
+                           AutoSize = true,
+                           Text = text,
+                           Dock = DockStyle.Fill,
+                           Margin = Padding.Empty,
+                           Padding = Padding.Empty,
+                           ForeColor = color,
+                           TextAlign = ContentAlignment.TopLeft
+                       };
         }
 
         private void OnPlayerMadeShot(object sender, ShootingEventArgs e)
@@ -74,163 +108,134 @@ namespace SeatBattle.CSharp
 
         private void RefreshPlayerStats()
         {
-            _player1Stats.Text = string.Format(PlayerStatsTemplate, _shipsLeft.X, _shotsLeft.X);
-            _player2Stats.Text = string.Format(PlayerStatsTemplate, _shipsLeft.Y, _shotsLeft.Y);
+            _playerStats.First.Text = string.Format(PlayerStatsTemplate, _shipsLeft.X, _shotsLeft.X);
+            _playerStats.Second.Text = string.Format(PlayerStatsTemplate, _shipsLeft.Y, _shotsLeft.Y);
         }
 
 
         private void OnPlayerTurnChanged(object sender, EventArgs e)
         {
-            var color1 = sender == _player1 ? _activePlayerNameColor : _playerNameColor;
-            var color2 = sender == _player2 ? _activePlayerNameColor : _playerNameColor;
+            var color1 = sender == _player1 ? ActivePlayerColor : InactivePlayerColor;
+            var color2 = sender == _player2 ? ActivePlayerColor : InactivePlayerColor;
 
-            _player1Label.ForeColor = color1;
-            _player2Label.ForeColor = color2;
+            _playerNames.First.ForeColor = color1;
+            _playerNames.Second.ForeColor = color2;
         }
 
-        public void SetActivePlayer(int player)
+        public bool GameHasEnded()
         {
-            var color1 = player == 1 ? _activePlayerNameColor : _playerNameColor;
-            var color2 = player == 2 ? _activePlayerNameColor : _playerNameColor;
-
-            _player1Label.ForeColor = color1;
-            _player2Label.ForeColor = color2;
+            return _shipsLeft.X == 0 || _shipsLeft.Y == 0;
         }
 
         private void TrackResult()
         {
-            if (_shipsLeft.X != 0 && _shipsLeft.Y != 0) 
+            if (!GameHasEnded())
                 return;
+
+            Color color1;
+            Color color2;
 
             if (_shipsLeft.X == 0)
             {
-                _score.X++;
+                _score.Y++;
+                color1 = LooserColor;
+                color2 = WinnerColor;
             }
             else
             {
-                _score.Y++;
+                _score.X++;
+                color1 = WinnerColor;
+                color2 = LooserColor;
             }
+
+            _playerNames.First.ForeColor = color1;
+            _playerNames.Second.ForeColor = color2;
+
+            OnGameEnded();
 
             var handler = GameEnded;
             if (handler != null)
                 handler(this, EventArgs.Empty);
         }
 
+        private void RefreshScore()
+        {
+            _scoreLabel.Text = string.Format(ScoreTemplate, _score.X, _score.Y);
+        }
+
+        private void OnGameEnded()
+        {
+            RefreshScore();
+        }
+
         public event EventHandler GameEnded;
 
 
-        public void FullReset()
+        public void NewGame()
         {
-            _score = new Point(0, 0);
-            _scoreLabel.Text = string.Format(ScoreTemplate, _score.X, _score.Y);
-            Reset();
-        }
-
-        public void Reset()
-        {
-            _shipsLeft = new Point(_shipsPerGame, _shipsPerGame);
-            _shotsLeft = new Point(_shotsPerGame, _shotsPerGame);
-            _player1Stats.Visible = false;
-            _player2Stats.Visible = false;
-        }
-
-        public void StartGate()
-        {
-            _player1Stats.Visible = true;
-            _player2Stats.Visible = true;
+            InitPlayerStats();
             RefreshPlayerStats();
+            _playerNames.First.ForeColor = InactivePlayerColor;
+            _playerNames.Second.ForeColor = InactivePlayerColor;
         }
+
+
 
 
 
         #region Layout
-        protected override void InitLayout()
+
+        private void AddLayoutColumns()
         {
-            base.InitLayout();
-            RowCount = 2;
+
             ColumnCount = 3;
-            Padding = Margin = Padding.Empty;
-            Font = Parent.Font;
-
-            RowStyles.Add(new RowStyle(SizeType.AutoSize, 0));
-            RowStyles.Add(new RowStyle(SizeType.AutoSize, 0));
-
             ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40));
             ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
             ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40));
+        }
 
+        private void AddLayoutRows()
+        {
+            RowCount = 2;
+            RowStyles.Add(new RowStyle(SizeType.AutoSize, 0));
+            RowStyles.Add(new RowStyle(SizeType.AutoSize, 0));
+        }
 
+        protected override void InitLayout()
+        {
+            base.InitLayout();
+            Padding = Margin = Padding.Empty;
+            Font = Parent.Font;
+            
+            AddLayoutColumns();
+            AddLayoutRows();
 
-            _player1Label = new Label
-            {
-                AutoSize = true,
-                Font = new Font("Calibri", 30, FontStyle.Regular, GraphicsUnit.Pixel, 186),
-                Text = "Human",
-                Dock = DockStyle.Fill,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            Controls.Add(_player1Label, 0, 0);
+            _playerNames.First.Font = new Font(Font.FontFamily,30);
+            Controls.Add(_playerNames.First, 0, 0);
 
-            _player2Label = new Label
-            {
-                AutoSize = true,
-                Font = new Font("Calibri", 30, FontStyle.Regular, GraphicsUnit.Pixel, 186),
-                TextAlign = ContentAlignment.TopRight,
-                Text = "Computer",
-                Dock = DockStyle.Fill,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            Controls.Add(_player2Label, 2, 0);
+            _playerNames.Second.Font = new Font(Font.FontFamily, 30);
+            _playerNames.Second.TextAlign = ContentAlignment.TopRight;
+            Controls.Add(_playerNames.Second, 2, 0);
 
-            _scoreLabel = new Label
-            {
-                AutoSize = true,
-                Font = new Font("Calibri", 16, FontStyle.Bold, GraphicsUnit.Point, 186),
-                TextAlign = ContentAlignment.TopCenter,
-                Text = "0 : 0",
-                Dock = DockStyle.Fill,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
+            _scoreLabel.Font = new Font(Font.FontFamily, 30, FontStyle.Bold);
+            _scoreLabel.TextAlign = ContentAlignment.TopCenter;
             Controls.Add(_scoreLabel, 1, 0);
 
-            _player1Stats = new Label
-            {
-                AutoSize = true,
-                TextAlign = ContentAlignment.TopLeft,
-                Text = "Ships left: 0, Shots Left: 1",
-                Dock = DockStyle.Fill,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            Controls.Add(_player1Stats, 0, 1);
+            _playerStats.First.Font = Font;
+            Controls.Add(_playerStats.First, 0, 1);
 
-            _player2Stats = new Label
-            {
-                AutoSize = true,
-                TextAlign = ContentAlignment.TopRight,
-                Text = "Ships left: 0, Shots Left: 1",
-                Dock = DockStyle.Fill,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-            Debug.WriteLine(_player2Stats.Font.Name);
-            Controls.Add(_player2Stats, 2, 1);
+            _playerStats.Second.Font = Font;
+            _playerStats.Second.TextAlign = ContentAlignment.TopRight;
+            Controls.Add(_playerStats.Second, 2, 1);
+
+            Debug.WriteLine(_playerStats.First.Font.Name);
 
 
-            Height = _player1Label.Height + _player1Stats.PreferredHeight;
+            Height = _playerNames.First.Height + _playerStats.First.Height;
         }
 
-        private void CreateLayout()
-        {
-            //BackColor = Color.Green;
 
-            
 
-        }
-        
         #endregion
 
     }

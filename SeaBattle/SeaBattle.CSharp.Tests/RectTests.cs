@@ -225,7 +225,6 @@ namespace SeaBattle.CSharp.Tests
             var result1 = r1.IntersectsWith(r2);
             var result2 = r2.IntersectsWith(r1);
 
-            // TODO: continue here
             // Assert
             Assert.IsTrue(result1);
             Assert.IsTrue(result2);
@@ -242,7 +241,6 @@ namespace SeaBattle.CSharp.Tests
             var result1 = r1.IntersectsWith(r2);
             var result2 = r2.IntersectsWith(r1);
 
-            // TODO: continue here
             // Assert
             Assert.IsTrue(result1);
             Assert.IsTrue(result2);
@@ -259,7 +257,6 @@ namespace SeaBattle.CSharp.Tests
             var result1 = r1.IntersectsWith(r2);
             var result2 = r2.IntersectsWith(r1);
 
-            // TODO: continue here
             // Assert
             Assert.IsTrue(result1);
             Assert.IsTrue(result2);

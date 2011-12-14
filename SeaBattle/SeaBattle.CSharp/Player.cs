@@ -7,6 +7,7 @@ namespace SeatBattle.CSharp
     public abstract class Player
     {
         protected readonly Dictionary<Point, ShotResult> PastShots;
+        private bool _canSoot;
 
         protected Player(string name)
         {
@@ -18,15 +19,25 @@ namespace SeatBattle.CSharp
 
         public virtual void Shoot()
         {
+            _canSoot = true;
             var handler = MyTurn;
             if (handler != null)
                 handler(this, new EventArgs());
         }
 
-
+        public virtual void Reset()
+        {
+            PastShots.Clear();
+            _canSoot = false;
+        }
 
         protected void ShotTargetChosen(int x, int y)
         {
+            if (!_canSoot)
+                return;
+
+            _canSoot = false;
+
             var shooting = Shooting;
             if (shooting == null)
                 return;
