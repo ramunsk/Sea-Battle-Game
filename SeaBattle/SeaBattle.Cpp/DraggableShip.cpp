@@ -4,9 +4,10 @@
 
 DraggableShip::DraggableShip(int length) : Ship(length)
 {
+    Length = length;
 };
 
-DraggableShip^ DraggableShip::From(Ship ^ship)
+DraggableShip^ DraggableShip::From(Ship^ ship)
 {
 	DraggableShip^ draggableShip = gcnew DraggableShip(ship->Length);
     draggableShip->X = ship->X;

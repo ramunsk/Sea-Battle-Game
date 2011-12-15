@@ -87,10 +87,13 @@
     <ClCompile Include="BoardCellClickEventArgs.cpp" />
     <ClCompile Include="ComputerPlayer.cpp" />
     <ClCompile Include="DraggableShip.cpp" />
+    <ClCompile Include="GameController.cpp" />
     <ClCompile Include="HumanPlayer.cpp" />
+    <ClCompile Include="MainForm.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Program.cpp" />
     <ClCompile Include="Rect.cpp" />
+    <ClCompile Include="ScoreBoard.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="ShootingEventArgs.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -106,10 +109,13 @@
     <ClInclude Include="ComputerPlayer.h" />
     <ClInclude Include="DraggableShip.h" />
     <ClInclude Include="Enums.h" />
+    <ClInclude Include="GameController.h" />
     <ClInclude Include="HumanPlayer.h" />
+    <ClInclude Include="MainForm.h" />
     <ClInclude Include="Pair.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Rect.h" />
+    <ClInclude Include="ScoreBoard.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="ShootingEventArgs.h" />
     <ClInclude Include="stdafx.h" />

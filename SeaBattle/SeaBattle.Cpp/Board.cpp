@@ -4,14 +4,21 @@
 
 Board::Board()
 {
-    Board(true);
+   _drawShips = true;
+	_cells = gcnew array<BoardCell^, 2>(10, 10);
+	_ships = gcnew List<Ship^>;
+	_rnd = gcnew Random(DateTime::Now.Millisecond);
+	Mode = BoardMode::Design;
+	Margin = Padding.Empty;
+
+	CreateBoard();
 }
 
 Board::Board(bool drawShips)
 {
 	_drawShips = drawShips;
 	_cells = gcnew array<BoardCell^, 2>(10, 10);
-	_ships = gcnew List<Ship^>();
+	_ships = gcnew List<Ship^>;
 	_rnd = gcnew Random(DateTime::Now.Millisecond);
 	Mode = BoardMode::Design;
 	Margin = Padding.Empty;
@@ -108,7 +115,7 @@ void Board::RedrawRegion(Rect^ region)
 
 void Board::DrawShip(Ship^ ship, BoardCellState state)
 {
-			DrawShip(ship, state, false);
+	DrawShip(ship, state, false);
 };
 
 void Board::DrawShip(Ship^ ship, BoardCellState state, bool force)
@@ -120,6 +127,7 @@ void Board::DrawShip(Ship^ ship, BoardCellState state, bool force)
 
 	for each (Point point in points)
 	{
+        System::Diagnostics::Debug::WriteLine("B");
 		if (BoardRegion->Contains(point))
 		{
 			_cells[point.X, point.Y]->State = state;
@@ -178,6 +186,7 @@ void Board::OnCellQueryContinueDrag(Object^ sender, QueryContinueDragEventArgs^ 
 
 void Board::OnCellDragEnter(Object^ sender, DragEventArgs^ e)
 {
+   
 	if (e->Data->GetDataPresent(Ship::typeid))
 	{
 		BoardCell^ cell = safe_cast<BoardCell^>(sender);
@@ -240,7 +249,7 @@ Ship^ Board::GetShipAt(int x, int y)
     }
 
     return nullptr;
-}
+};
 
 bool Board::CanPlaceShip(Ship^ ship, int x, int y)
 {
@@ -272,7 +281,7 @@ bool Board::CanPlaceShip(Ship^ ship, int x, int y)
 
     delete shipRegion;
 	return true;
-}
+};
 
 IList<Ship^>^ Board::GetNewShips()
 {
@@ -283,13 +292,13 @@ IList<Ship^>^ Board::GetNewShips()
     ships->Add(gcnew Ship(2, safe_cast<ShipOrientation>(_rnd->Next(2))));
     ships->Add(gcnew Ship(2, safe_cast<ShipOrientation>(_rnd->Next(2))));
     ships->Add(gcnew Ship(2, safe_cast<ShipOrientation>(_rnd->Next(2))));
-    ships->Add(gcnew Ship(1));
-    ships->Add(gcnew Ship(1));
-    ships->Add(gcnew Ship(1));
-    ships->Add(gcnew Ship(1));
+    ships->Add(gcnew Ship(1, ShipOrientation::Horizontal));
+    ships->Add(gcnew Ship(1, ShipOrientation::Horizontal));
+    ships->Add(gcnew Ship(1, ShipOrientation::Horizontal));
+    ships->Add(gcnew Ship(1, ShipOrientation::Horizontal));
 
 	return ships;
-}
+};
 
 void Board::ClearBoard()
 {
@@ -306,7 +315,7 @@ void Board::ClearBoard()
     delete points;
 
 	ResumeLayout();
-}
+};
 
 void Board::AddShip(Ship^ ship, int x, int y)
 {
@@ -314,7 +323,7 @@ void Board::AddShip(Ship^ ship, int x, int y)
 
 	_ships->Add(ship);
 	DrawShip(ship, BoardCellState::Ship);
-}
+};
 
 void Board::ShowShips()
 {
@@ -333,7 +342,7 @@ void Board::ShowShips()
 
         delete shipPoints;
 	}
-}
+};
 
 void Board::AddRandomShips()
 {
@@ -360,10 +369,8 @@ void Board::AddRandomShips()
 		}
 	}
 
-    delete ships;
-
 	ResumeLayout();
-}
+};
 
 ShotResult Board::OpenentShotAt(int x, int y)
 {

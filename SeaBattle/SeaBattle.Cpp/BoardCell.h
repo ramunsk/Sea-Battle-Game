@@ -12,8 +12,8 @@ ref class BoardCell : Label
         static initonly Color ShipColor = Color::FromArgb(65,133,243);
         static initonly Color ShipDrownedColor = Color::FromArgb(222, 0, 0);
 
-		static initonly char^ ShipHitChar = (char)(0x72);
-		static initonly char^ MissedHitChar = (char)(0x3D);
+		static initonly Char ShipHitChar = (Char)(0x72);
+		static initonly Char MissedHitChar = (Char)(0x3D);
 
     private:
 		void OnCellStateChenged();

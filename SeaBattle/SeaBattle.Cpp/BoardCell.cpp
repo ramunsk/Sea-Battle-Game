@@ -22,7 +22,7 @@ void BoardCell::OnCellStateChenged()
 			BackColor = DefaultBackgroundColor;
 			break;
 		case BoardCellState::MissedShot:
-			Text = MissedHitChar->ToString();
+			Text = MissedHitChar.ToString();
 			BackColor = DefaultBackgroundColor;
 			break;
 		case BoardCellState::Ship:
@@ -30,7 +30,7 @@ void BoardCell::OnCellStateChenged()
 			BackColor = ShipColor;
 			break;
 		case BoardCellState::ShotShip:
-			Text = ShipHitChar->ToString();
+			Text = ShipHitChar.ToString();
 			BackColor = ShipColor;
 			break;
 		case BoardCellState::ShipDrag:
@@ -43,7 +43,7 @@ void BoardCell::OnCellStateChenged()
 			break;
 		case BoardCellState::ShowDrowned:
 			BackColor = ShipDrownedColor;
-			Text = ShipHitChar->ToString();
+			Text = ShipHitChar.ToString();
 			break;
 	}
 	Invalidate();
