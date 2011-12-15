@@ -82,7 +82,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Board.cpp" />
+    <ClCompile Include="BoardCell.cpp" />
+    <ClCompile Include="BoardCellClickEventArgs.cpp" />
+    <ClCompile Include="ComputerPlayer.cpp" />
+    <ClCompile Include="DraggableShip.cpp" />
+    <ClCompile Include="HumanPlayer.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Program.cpp" />
+    <ClCompile Include="Rect.cpp" />
+    <ClCompile Include="Ship.cpp" />
+    <ClCompile Include="ShootingEventArgs.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -90,11 +100,27 @@
     <ClCompile Include="TempForm.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="Board.h" />
+    <ClInclude Include="BoardCell.h" />
+    <ClInclude Include="BoardCellClickEventArgs.h" />
+    <ClInclude Include="ComputerPlayer.h" />
+    <ClInclude Include="DraggableShip.h" />
+    <ClInclude Include="Enums.h" />
+    <ClInclude Include="HumanPlayer.h" />
+    <ClInclude Include="Pair.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Rect.h" />
+    <ClInclude Include="Ship.h" />
+    <ClInclude Include="ShootingEventArgs.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TempForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TempForm.resx">
+      <DependentUpon>TempForm.h</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

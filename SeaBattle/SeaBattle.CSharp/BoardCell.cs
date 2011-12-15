@@ -28,13 +28,9 @@ namespace SeatBattle.CSharp
             Y = y;
             base.AutoSize = false;
             base.TextAlign = ContentAlignment.MiddleCenter;
-            base.BackColor = Color.LightBlue;
             base.Font = new Font("Webdings", 10);
             base.AllowDrop = true;
         }
-
-        public bool IsOccupied { get; set; }
-
 
         public BoardCellState State
         {

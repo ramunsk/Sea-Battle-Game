@@ -24,21 +24,79 @@
     <ClCompile Include="TempForm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Rect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BoardCell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Board.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ship.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DraggableShip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BoardCellClickEventArgs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShootingEventArgs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HumanPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComputerPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TempForm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="TempForm.resx">
-      <Filter>Resource Files</Filter>
-    </EmbeddedResource>
+    <ClInclude Include="Rect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Enums.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Pair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BoardCell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Board.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ship.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DraggableShip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BoardCellClickEventArgs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShootingEventArgs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HumanPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComputerPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

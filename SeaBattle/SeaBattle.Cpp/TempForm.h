@@ -62,6 +62,7 @@ namespace SeaBattleCpp {
             this->label1->TabIndex = 0;
             this->label1->Text = L"label1";
             this->label1->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
+            this->label1->Click += gcnew System::EventHandler(this, &TempForm::label1_Click);
             // 
             // TempForm
             // 
@@ -75,5 +76,7 @@ namespace SeaBattleCpp {
 
         }
 #pragma endregion
-	};
+    private: System::Void label1_Click(System::Object^  sender, System::EventArgs^  e) {
+             }
+    };
 }
