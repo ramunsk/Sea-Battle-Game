@@ -12,7 +12,7 @@ ref class ScoreBoard : TableLayoutPanel
 		initonly int _shotsPerGame;
 		initonly Label^ _scoreLabel;
 
-		literal String^ PlayerStatsTemplate = "Ships left: {0}, Shots left: {1}";
+		literal String^ PlayerStatsTemplate = "Liko laivø: {0}, Liko ðûviø: {1}";
 		literal String^ ScoreTemplate = "{0} : {1}";
 
 		static initonly Color ActivePlayerColor = Color::FromArgb(255,174,0);

@@ -165,10 +165,10 @@ void ScoreBoard::InitLayout()
    AddLayoutColumns();
    AddLayoutRows();
 
-   _playerNames->First->Font = gcnew Drawing::Font(Font->FontFamily,30);
+   _playerNames->First->Font = gcnew Drawing::Font(Font->FontFamily,24);
    Controls->Add(_playerNames->First, 0, 0);
 
-   _playerNames->Second->Font = gcnew Drawing::Font(Font->FontFamily, 30);
+   _playerNames->Second->Font = gcnew Drawing::Font(Font->FontFamily, 24);
    _playerNames->Second->TextAlign = ContentAlignment::TopRight;
    Controls->Add(_playerNames->Second, 2, 0);
 

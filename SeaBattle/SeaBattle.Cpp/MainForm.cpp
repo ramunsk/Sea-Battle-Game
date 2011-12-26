@@ -8,8 +8,8 @@ MainForm::MainForm()
 	_humanBoard = gcnew Board();
 	_computerBoard = gcnew Board(false);
 
-	_humanPlayer = gcnew HumanPlayer("You", _computerBoard);
-	_computerPlayer = gcnew ComputerPlayer("Computer");
+	_humanPlayer = gcnew HumanPlayer("Þaidëjas", _computerBoard);
+	_computerPlayer = gcnew ComputerPlayer("Kompiuteris");
 
 
 	_scoreboard = gcnew ScoreBoard(_humanPlayer, _computerPlayer, 10, 100);

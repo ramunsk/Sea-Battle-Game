@@ -2,11 +2,6 @@
 #include "MainForm.h"
 
 
-using namespace System;
-
-
-
-
 [STAThreadAttribute]
 int main(array<System::String ^> ^args)
 {

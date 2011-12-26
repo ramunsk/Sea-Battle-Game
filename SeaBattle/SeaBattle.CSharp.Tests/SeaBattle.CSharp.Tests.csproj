@@ -50,12 +50,6 @@
     <Compile Include="RectTests.cs" />
     <Compile Include="ShipTests.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SeaBattle.CSharp\SeaBattle.CSharp.csproj">
-      <Project>{8CF337B1-E8BC-48E0-9B9F-7A65A65B82A9}</Project>
-      <Name>SeaBattle.CSharp</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
